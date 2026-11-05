@@ -4,6 +4,8 @@ import { inputOutputLessons, inputOutputMCQs, inputOutputCodingQuestions } from 
 import { operatorsLessons, operatorsMCQs, operatorsCodingQuestions } from './topics/operators-expressions';
 import { decisionLessons, decisionMCQs, decisionCodingQuestions } from './topics/decision-making';
 import { loopingLessons, loopingMCQs, loopingCodingQuestions } from './topics/looping';
+import { guidedCodingQuestions } from './learning-arena/codingPractice';
+import { challengeCodingQuestions } from './learning-arena/challengeQuestions';
 
 export { TOPICS_META } from './topicsMeta';
 
@@ -48,13 +50,29 @@ export function getTopicMCQs(topicId: TopicId): MCQ[] {
 export function getTopicCodingQuestions(topicId: TopicId): CodingQuestion[] {
   switch (topicId) {
     case 'input-output':
-      return inputOutputCodingQuestions;
+      return [
+        ...inputOutputCodingQuestions.slice(0, 20),
+        ...challengeCodingQuestions['input-output'],
+        ...guidedCodingQuestions['input-output'],
+      ];
     case 'operators-expressions':
-      return operatorsCodingQuestions;
+      return [
+        ...operatorsCodingQuestions.slice(0, 20),
+        ...challengeCodingQuestions['operators-expressions'],
+        ...guidedCodingQuestions['operators-expressions'],
+      ];
     case 'decision-making':
-      return decisionCodingQuestions;
+      return [
+        ...decisionCodingQuestions.slice(0, 20),
+        ...challengeCodingQuestions['decision-making'],
+        ...guidedCodingQuestions['decision-making'],
+      ];
     case 'looping':
-      return loopingCodingQuestions;
+      return [
+        ...loopingCodingQuestions.slice(0, 20),
+        ...challengeCodingQuestions.looping,
+        ...guidedCodingQuestions.looping,
+      ];
     default:
       return [];
   }

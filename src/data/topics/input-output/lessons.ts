@@ -5,231 +5,134 @@ export const inputOutputLessons: Lesson = {
   topicId: 'input-output',
   title: 'Input and Output in C',
   order: 1,
+  startHere: 'Input lets your program receive information, and output lets it share a result. In C, printf displays text and scanf reads typed values. These tools appear in almost every small program. After this path, you can read simple values, calculate with them, and print clear results.',
   sections: [
     {
       id: 'sec-printf-scanf',
-      title: 'printf and scanf Fundamentals',
-      concept:
-        'Standard input and output in C are provided by the <stdio.h> library. `printf()` formats and prints text to standard output (stdout), returning the total number of characters successfully written. `scanf()` parses formatted data from standard input (stdin), returning the count of successfully matched and assigned items.',
-      syntax: `int printf(const char *format, ...);\nint scanf(const char *format, ...);`,
-      codeSnippet: `#include <stdio.h>
-
-int main() {
-    int age;
-    float gpa;
-    
-    printf("Enter age and GPA: ");
-    // scanf requires memory addresses using the address-of operator (&)
-    int itemsRead = scanf("%d %f", &age, &gpa);
-    
-    int charsPrinted = printf("Recorded: Age = %d, GPA = %.2f (Items read: %d)\\n", age, gpa, itemsRead);
-    printf("Characters written by last printf: %d\\n", charsPrinted);
-    
-    return 0;
-}`,
-      annotation:
-        'Note the return values: scanf() returns the number of successfully read fields, which allows robust error detection. printf() returns the total character count written to stdout.',
-      commonMistakes: [
-        'Forgetting the & (address-of) operator before primitive variables in scanf(), causing undefined behavior or segmentation fault.',
-        'Passing mismatched format specifiers (e.g. %d for a float variable), which leads to memory misinterpretation.',
-        'Assuming scanf("%s", str) reads full multi-word sentences with spaces (it stops at the first whitespace).',
-      ],
-      quickRecap: [
-        'Always check the return value of scanf() to verify user input succeeded.',
-        'scanf requires addresses (&age); arrays/strings decay to pointers so they do not require &.',
-        'printf returns the number of characters written.',
-      ],
+      title: 'Foundation · Display and read values',
+      level: 'Foundation',
+      concept: 'printf displays text or values. scanf reads values typed by the user into variables.',
+      syntax: 'printf("%d", value);\nscanf("%d", &value);',
+      codeSnippet: '#include <stdio.h>\n\nint main(void) {\n    int age;\n    scanf("%d", &age);\n    printf("Age: %d\\n", age);\n    return 0;\n}',
+      keyPoint: 'Use & before a simple variable in scanf so C knows where to store the input.',
     },
     {
       id: 'sec-format-specifiers',
-      title: 'Format Specifiers Exhaustive Guide',
-      concept:
-        'Format specifiers begin with a % symbol and direct the I/O engine on how to convert binary representations to human-readable strings and vice-versa. Using the incorrect specifier leads to type misinterpretation or stack corruption.',
-      syntax: `%[flags][width][.precision][length]type`,
-      codeSnippet: `#include <stdio.h>
-
-int main() {
-    int num = 42;
-    unsigned int unum = 3000000000U;
-    float f = 3.14159f;
-    double d = 2.718281828459;
-    char ch = 'Z';
-    char str[] = "C Programming";
-    void *ptr = &num;
-
-    printf("Integer (decimal):    %d or %i\\n", num, num);
-    printf("Unsigned int:         %u\\n", unum);
-    printf("Hexadecimal:          0x%x (uppercase: 0x%X)\\n", num, num);
-    printf("Octal:                %o\\n", num);
-    printf("Float:                %f\\n", f);
-    printf("Double (standard):    %lf\\n", d);
-    printf("Scientific notation:  %e\\n", d);
-    printf("Single character:     %c (ASCII code: %d)\\n", ch, ch);
-    printf("String:               %s\\n", str);
-    printf("Memory address (ptr): %p\\n", ptr);
-    
-    return 0;
-}`,
-      annotation:
-        '%p prints pointers formatted in implementation-defined hexadecimal (often prefixed with 0x). For scanf(), double requires %lf, whereas float requires %f.',
-      commonMistakes: [
-        'Using %f in scanf for a double variable. In scanf, %f writes 4 bytes to float, while double expects 8 bytes via %lf!',
-        'Using %c immediately after %d in scanf without consuming the trailing newline character.',
-        'Using %u with negative integers, resulting in unexpected high unsigned numbers.',
-      ],
-      quickRecap: [
-        'int: %d or %i; unsigned: %u; hex: %x / %X; octal: %o',
-        'float: %f in printf & scanf; double: %lf in scanf (%f or %lf in printf C99)',
-        'char: %c; string: %s; pointer: %p',
-      ],
-    },
-    {
-      id: 'sec-char-string-io',
-      title: 'Character & Stream I/O: getchar, putchar, fgets, puts',
-      concept:
-        'Beyond printf and scanf, C provides unbuffered/stream-oriented routines. `getchar()` reads one unsigned char cast to int from stdin (or returns EOF). `putchar()` writes one character. `fgets()` safely reads an entire line including spaces up to a specified buffer size, replacing the deprecated, unsafe `gets()`.',
-      syntax: `int getchar(void);\nint putchar(int c);\nchar *fgets(char *str, int n, FILE *stream);\nint puts(const char *str);`,
-      codeSnippet: `#include <stdio.h>
-
-int main() {
-    char buffer[64];
-    
-    printf("Enter a full line of text: ");
-    // Safe string input with boundary check
-    if (fgets(buffer, sizeof(buffer), stdin) != NULL) {
-        printf("You entered via puts():\\n");
-        // puts automatically appends a newline \\n
-        puts(buffer);
-    }
-    
-    printf("Enter a single character: ");
-    int c = getchar();
-    printf("Echoing back via putchar: ");
-    putchar(c);
-    putchar('\\n');
-    
-    return 0;
-}`,
-      annotation:
-        'gets() was officially removed in C11 because it does not accept a buffer size and causes buffer-overflow exploits. Always use fgets(buffer, sizeof(buffer), stdin) instead.',
-      commonMistakes: [
-        'Using gets() in modern code. It is dangerous and triggers compiler deprecation warnings or build failures.',
-        'Storing the return of getchar() in a char variable instead of an int. EOF is typically -1, which may not fit properly in an unsigned char.',
-        'Forgetting that fgets() preserves the trailing newline "\\n" if buffer space permits.',
-      ],
-      quickRecap: [
-        'getchar() returns int so it can distinguish legitimate characters from EOF (-1).',
-        'puts(s) automatically appends a newline "\\n", whereas fputs(s, stdout) does not.',
-        'fgets(buffer, size, stdin) is the secure standard for multi-word string input.',
-      ],
+      title: 'Foundation · Format specifiers',
+      level: 'Foundation',
+      concept: 'A format specifier tells printf or scanf what kind of value is being used. For example, %d is for int, %f for float, and %c for char.',
+      syntax: 'int count;      // %d\nfloat price;  // %f\nchar grade;   // %c',
+      codeSnippet: '#include <stdio.h>\n\nint main(void) {\n    int count = 3;\n    float price = 2.5f;\n    printf("%d items cost %.2f\\n", count, price);\n    return 0;\n}',
+      keyPoint: 'The specifier and the variable type must match.',
     },
     {
       id: 'sec-escape-sequences',
-      title: 'Escape Sequences and Special Characters',
-      concept:
-        'Escape sequences allow representation of non-printable or control characters within string and character literals using a backslash \\ prefix.',
-      syntax: `\\n (newline), \\t (tab), \\r (carriage return), \\b (backspace), \\\\ (backslash), \\" (quote), \\0 (null terminator)`,
-      codeSnippet: `#include <stdio.h>
-
-int main() {
-    printf("Line 1\\nLine 2\\n");
-    printf("Col 1\\tCol 2\\tCol 3\\n");
-    printf("Quotes inside string: \\"C99 Standard\\"\\n");
-    printf("Printing a backslash: \\\\\\n");
-    printf("Printing a literal percent sign: 100%%\\n");
-    printf("Alert bell sound: \\a (may beep on terminal)\\n");
-    
-    return 0;
-}`,
-      annotation:
-        'To print a literal percent symbol in a printf format string, use %%, not \\%.',
-      commonMistakes: [
-        'Using \\% instead of %% to print a percent sign in printf.',
-        'Confusing \\0 (null terminator, ASCII 0) with character \'0\' (ASCII 48).',
-        'Forgetting that \\r moves the carriage to the start of the line without advancing downward.',
-      ],
-      quickRecap: [
-        '\\n moves to next line; \\t creates an 8-space aligned horizontal tab.',
-        '%% prints a single % character in printf.',
-        '\\0 terminates strings in C.',
-      ],
+      title: 'Core Concepts · New lines and readable output',
+      level: 'Core Concepts',
+      concept: 'Escape sequences add special characters inside a string. The most common are \\n for a new line and \\t for a tab.',
+      syntax: 'printf("First line\\nSecond line\\n");',
+      codeSnippet: '#include <stdio.h>\n\nint main(void) {\n    printf("Name\\tScore\\nMira\\t90\\n");\n    return 0;\n}',
+      keyPoint: 'A backslash starts an escape sequence; use %% to print a percent sign.',
     },
     {
-      id: 'sec-width-precision',
-      title: 'Width, Precision, and Alignment Formatting',
-      concept:
-        'C printf offers precision control: minimum field width, leading zeros padding, left-justification flags, and floating-point fractional digits.',
-      syntax: `%[flags][width][.precision]type\nFlags: - (left align), + (force sign), 0 (zero pad), # (alternate form)`,
-      codeSnippet: `#include <stdio.h>
-
-int main() {
-    int val = 42;
-    double pi = 3.14159265;
-    
-    printf("|%10d| (Right aligned, width 10)\\n", val);
-    printf("|%-10d| (Left aligned, flag -)\\n", val);
-    printf("|%+10d| (Explicit sign, flag +)\\n", val);
-    printf("|%010d| (Zero-padded, flag 0)\\n", val);
-    
-    printf("Pi 2 decimals: %.2f\\n", pi);
-    printf("Pi 4 decimals: %.4f\\n", pi);
-    printf("Pi width 12, 3 decimals: |%12.3f|\\n", pi);
-    
-    char name[] = "Algorithm";
-    printf("Truncated string: %.5s\\n", name); // Prints only first 5 chars
-    
-    return 0;
-}`,
-      annotation:
-        'Precision for floats specifies the number of digits after the decimal point (with rounding). Precision for strings (%.Ns) limits the maximum number of characters output.',
-      commonMistakes: [
-        'Using %0-10d (combining 0 and -). The - flag overrides 0 padding in standard C.',
-        'Assuming %.2f truncates instead of rounds: 3.146 with %.2f prints 3.15.',
-      ],
-      quickRecap: [
-        '%10d allocates minimum 10 columns right-aligned; %-10d left-aligns.',
-        '%08d pads numbers with leading zeros up to 8 digits.',
-        '%.Nf controls exact decimal places with IEEE rounding.',
-      ],
-    },
-    {
-      id: 'sec-buffer-flushing',
-      title: 'Stream Buffering & Input Sanitization',
-      concept:
-        'Standard I/O streams are buffered: stdout is typically line-buffered (flushes on \\n), and stdin retains leftover characters such as \\n after scanf reads numbers. This leftover newline can accidentally consume subsequent character reads.',
-      syntax: `fflush(stdout);\nwhile((c = getchar()) != '\\n' && c != EOF); // clear stdin buffer`,
-      codeSnippet: `#include <stdio.h>
-
-int main() {
-    int number;
-    char letter;
-    
-    printf("Enter an integer: ");
-    scanf("%d", &number);
-    
-    // Notice the space before %c: it skips leading whitespace including leftover '\\n'
-    printf("Enter a character: ");
-    scanf(" %c", &letter);
-    
-    printf("You entered number %d and character '%c'\\n", number, letter);
-    
-    // Explicitly flush stdout when prompting without a newline
-    printf("Processing...");
-    fflush(stdout);
-    
-    return 0;
-}`,
-      annotation:
-        'A leading space in scanf(" %c", &ch) tells scanf to skip all leading whitespace characters (spaces, tabs, newlines) before capturing the character.',
-      commonMistakes: [
-        'Calling fflush(stdin). In the C standard (C99/C11), fflush is only defined for output streams; calling it on stdin is undefined behavior.',
-        'Failing to clean up buffer when mixing scanf and getchar().',
-      ],
-      quickRecap: [
-        'Use " %c" (space before %c) in scanf to automatically ignore leftover newlines.',
-        'fflush(stdout) forces immediate terminal render without waiting for \\n.',
-        'Never use fflush(stdin); instead drain stdin using a while(getchar() != \'\\n\') loop.',
-      ],
+      id: 'sec-precision',
+      title: 'Intermediate · Format a calculated result',
+      level: 'Intermediate',
+      concept: 'A printf format can control how many decimal places appear. This is useful for averages, prices, and measurements.',
+      syntax: 'printf("%.2f", result);',
+      codeSnippet: '#include <stdio.h>\n\nint main(void) {\n    float first = 7.0f;\n    float second = 8.0f;\n    float average = (first + second) / 2.0f;\n    printf("Average: %.2f\\n", average);\n    return 0;\n}',
+      keyPoint: 'Use a floating-point value such as 2.0f when you need a decimal result.',
     },
   ],
+  examples: [
+    {
+      title: 'Example 1 — Very Easy',
+      difficulty: 'Very Easy',
+      problem: 'Print a short welcome message.',
+      approach: 'Use printf with a string and a newline.',
+      code: '#include <stdio.h>\n\nint main(void) {\n    printf("Welcome to C!\\n");\n    return 0;\n}',
+      expectedOutput: 'Welcome to C!',
+      explanation: 'The text inside the quotes is displayed, and \\n moves the cursor to the next line.',
+    },
+    {
+      title: 'Example 2 — Easy',
+      difficulty: 'Easy',
+      problem: 'Read one integer and print it with a label.',
+      approach: 'Declare an int, read it with %d, then print it with %d.',
+      code: '#include <stdio.h>\n\nint main(void) {\n    int number;\n    scanf("%d", &number);\n    printf("Number: %d\\n", number);\n    return 0;\n}',
+      expectedOutput: 'Input: 12\nOutput: Number: 12',
+      explanation: 'The address operator lets scanf store 12 in number.',
+    },
+    {
+      title: 'Example 3 — Moderate',
+      difficulty: 'Moderate',
+      problem: 'Read two integers and print their sum.',
+      approach: 'Read both values, add them, and print the result.',
+      code: '#include <stdio.h>\n\nint main(void) {\n    int first, second;\n    scanf("%d %d", &first, &second);\n    printf("Sum = %d\\n", first + second);\n    return 0;\n}',
+      expectedOutput: 'Input: 8 5\nOutput: Sum = 13',
+      explanation: 'scanf reads two values in order; printf evaluates the addition before displaying it.',
+    },
+    {
+      title: 'Example 4 — Intermediate',
+      difficulty: 'Intermediate',
+      problem: 'Read a quantity and a unit price, then print a two-decimal total.',
+      approach: 'Multiply the values and use %.2f to show two decimal places.',
+      code: '#include <stdio.h>\n\nint main(void) {\n    int quantity;\n    float unitPrice;\n    scanf("%d %f", &quantity, &unitPrice);\n    printf("Total = %.2f\\n", quantity * unitPrice);\n    return 0;\n}',
+      expectedOutput: 'Input: 3 4.5\nOutput: Total = 13.50',
+      explanation: 'The multiplication creates the total, while %.2f keeps the output easy to read.',
+    },
+  ],
+  practice: {
+    beginner: [
+      { title: 'Print your name', prompt: 'Write a program that prints your first name on one line.', difficulty: 'beginner' },
+      { title: 'Echo a number', prompt: 'Read one integer and print it as "You entered: N".', difficulty: 'beginner' },
+    ],
+    easy: [
+      { title: 'Add two values', prompt: 'Read two integers and print their sum on its own line.', difficulty: 'easy' },
+      { title: 'Convert minutes', prompt: 'Read a number of minutes and print the same value with the label "Minutes:".', difficulty: 'easy' },
+    ],
+    intermediate: [
+      { title: 'Average of three marks', prompt: 'Read three integer marks and print their average to two decimal places.', difficulty: 'intermediate' },
+      { title: 'Simple receipt', prompt: 'Read an item quantity and unit price; print the total to two decimal places.', difficulty: 'intermediate' },
+    ],
+  },
+  outputPredictions: [
+    {
+      code: '#include <stdio.h>\nint main(void) {\n    int n = 6;\n    printf("%d\\n", n + 2);\n    return 0;\n}',
+      options: ['6', '8', '62', 'Compilation error'],
+      correctIndex: 1,
+      explanation: 'The expression n + 2 is 8, and %d prints that integer.',
+    },
+    {
+      code: '#include <stdio.h>\nint main(void) {\n    printf("C\\nCode\\n");\n    return 0;\n}',
+      options: ['C Code on one line', 'C then Code on the next line', 'C\\nCode\\n literally', 'No output'],
+      correctIndex: 1,
+      explanation: 'Each \\n moves output to a new line.',
+    },
+  ],
+  commonMistakes: [
+    { mistake: 'Leaving out & in scanf("%d", &number).', why: 'scanf needs the variable address to store the value.', correctApproach: 'Use & before ordinary variables such as int, float, and char.' },
+    { mistake: 'Using %d for a float.', why: 'The format does not match the value type.', correctApproach: 'Use %f for float output/input and %.2f for two decimal places in printf.' },
+    { mistake: 'Expecting scanf("%s") to read a full sentence.', why: '%s stops at the first whitespace.', correctApproach: 'For beginner word input, use %s; use fgets when a complete line is needed.' },
+    { mistake: 'Forgetting \\n in the output.', why: 'The next output may continue on the same line.', correctApproach: 'Add \\n where a line should end.' },
+  ],
+  quickCheck: {
+    questions: [
+      { question: 'Which specifier prints an int?', options: ['%f', '%d', '%c', '%s'], correctIndex: 1, explanation: '%d is used for an int.' },
+      { question: 'Why is & used with scanf for an int variable?', options: ['It prints the variable', 'It gives scanf the place to store input', 'It changes the number', 'It starts a new line'], correctIndex: 1, explanation: 'scanf writes the entered value into the variable.' },
+      { question: 'Which escape sequence starts a new line?', options: ['\\t', '\\n', '\\0', '%%'], correctIndex: 1, explanation: '\\n moves output to the next line.' },
+    ],
+    outputPrediction: {
+      code: '#include <stdio.h>\nint main(void) {\n    int x = 4;\n    printf("%d %d\\n", x, x * 2);\n    return 0;\n}',
+      options: ['4 2', '4 8', '8 4', 'x x * 2'],
+      correctIndex: 1,
+      explanation: 'The first conversion prints x (4), and the second prints x * 2 (8).',
+    },
+    codingQuestion: 'Write a program that reads two integers and prints their product.',
+  },
+  completion: {
+    learned: ['printf and scanf', 'Common format specifiers', 'Escape sequences', 'Basic output formatting'],
+    canNow: ['Read simple numeric input', 'Match format specifiers to types', 'Display clear results', 'Write small input/output programs'],
+    nextStep: 'Continue to Operators and Expressions to calculate and compare values.',
+  },
 };

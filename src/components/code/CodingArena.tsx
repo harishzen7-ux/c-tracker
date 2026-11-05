@@ -7,15 +7,14 @@ import {
   XCircle,
   Code,
   Terminal,
-  Clock,
-  Sparkles,
-  AlertCircle,
   FileCode,
   Layers,
   ChevronRight,
+  ChevronLeft,
+  Lightbulb,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { CodingQuestion, TopicId, TestCase, ExecutionResult } from '../../types';
+import { CodingQuestion, TopicId, ExecutionResult } from '../../types';
 import { MonacoEditorWrapper } from './MonacoEditorWrapper';
 import { NeuCard } from '../common/NeuCard';
 import { NeuButton } from '../common/NeuButton';
@@ -63,19 +62,35 @@ export const CodingArena: React.FC<CodingArenaProps> = ({
   const [testCaseResults, setTestCaseResults] = useState<TestCaseResult[] | null>(null);
   const [allPassed, setAllPassed] = useState<boolean | null>(null);
   const [activeConsoleTab, setActiveConsoleTab] = useState<'custom' | 'testcases'>('testcases');
+  const [selectedTestCaseIndex, setSelectedTestCaseIndex] = useState(0);
+  const [hintLevel, setHintLevel] = useState(0);
+  const [solutionVisible, setSolutionVisible] = useState(false);
+  const [selectedTestPassed, setSelectedTestPassed] = useState<boolean | null>(null);
+  const visibleTestCases = currentQ?.testCases.filter((testCase) => !testCase.isHidden) || [];
+  const solvedCount = questions.filter((question) => storageService.isProblemSolved(question.id)).length;
+  const conceptName = currentQ?.concept || ({
+    'input-output': 'Input and Output',
+    'operators-expressions': 'Operators and Expressions',
+    'decision-making': 'Decision Making',
+    looping: 'Looping',
+  }[topicId]);
 
   // Load saved code when current question changes
   useEffect(() => {
     if (currentQ) {
       const saved = storageService.getSavedCode(currentQ.id, currentQ.starterCode);
       setCode(saved);
-      setCustomInput(currentQ.sampleCases[0]?.input || '');
+      setCustomInput(currentQ.testCases.find((testCase) => !testCase.isHidden)?.input || currentQ.sampleCases[0]?.input || '');
       setCustomResult(null);
       setTestCaseResults(null);
       setAllPassed(null);
       setActiveConsoleTab('testcases');
+      setSelectedTestCaseIndex(0);
+      setHintLevel(0);
+      setSolutionVisible(false);
+      setSelectedTestPassed(null);
     }
-  }, [currentQ]);
+  }, [currentQ?.id]);
 
   // Handle code change and auto-save
   const handleCodeChange = (newCode: string) => {
@@ -98,6 +113,7 @@ export const CodingArena: React.FC<CodingArenaProps> = ({
     if (!currentQ) return;
     setIsRunningCustom(true);
     setActiveConsoleTab('custom');
+    setSelectedTestPassed(null);
 
     try {
       const res = await codeRunnerService.runCode({
@@ -111,6 +127,33 @@ export const CodingArena: React.FC<CodingArenaProps> = ({
         stderr: e.message || 'Execution error',
         status: 'runtime_error',
       });
+    } finally {
+      setIsRunningCustom(false);
+    }
+  };
+
+  const handleRunTestCase = async () => {
+    if (!currentQ) return;
+    const testCase = visibleTestCases[selectedTestCaseIndex];
+    if (!testCase) return;
+
+    setIsRunningCustom(true);
+    setActiveConsoleTab('custom');
+    setCustomInput(testCase.input);
+
+    try {
+      const result = await codeRunnerService.runCode({
+        sourceCode: code,
+        stdin: testCase.input,
+        expectedOutput: testCase.expectedOutput,
+      });
+      const passed = !result.stderr && result.stdout.trim() === testCase.expectedOutput.trim();
+      setCustomResult(result);
+      setSelectedTestPassed(passed);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Execution failed';
+      setCustomResult({ stdout: '', stderr: message, status: 'runtime_error' });
+      setSelectedTestPassed(false);
     } finally {
       setIsRunningCustom(false);
     }
@@ -227,6 +270,17 @@ export const CodingArena: React.FC<CodingArenaProps> = ({
           })}
         </div>
       </div>
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-sm font-semibold text-[var(--neu-text-primary)]">
+          Problem {String(currentQ.number).padStart(2, '0')} / {questions.length}
+          <span className="ml-3 text-xs font-normal text-[var(--neu-text-secondary)]">
+            {solvedCount} / {questions.length} Solved
+          </span>
+        </p>
+        <div className="h-2 w-full overflow-hidden rounded-full bg-[var(--neu-base)] sm:w-48">
+          <div className="h-full rounded-full bg-[var(--neu-accent)]" style={{ width: `${questions.length ? (solvedCount / questions.length) * 100 : 0}%` }} />
+        </div>
+      </div>
 
       {/* Main Split Layout: Left Problem / Right Monaco Editor */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
@@ -237,7 +291,7 @@ export const CodingArena: React.FC<CodingArenaProps> = ({
             <div className="flex items-start justify-between gap-4 pb-3 border-b border-[var(--neu-border)]">
               <div>
                 <span className="text-xs font-mono text-[var(--neu-accent)] font-semibold">
-                  CHALLENGE {currentQ.number} OF {questions.length}
+                  PROBLEM {String(currentQ.number).padStart(2, '0')} / {questions.length}
                 </span>
                 <h2 className="text-lg sm:text-xl font-bold text-[var(--neu-text-primary)] mt-0.5">
                   {currentQ.title}
@@ -245,7 +299,9 @@ export const CodingArena: React.FC<CodingArenaProps> = ({
               </div>
 
               <div className="flex items-center gap-2 shrink-0">
-                <NeuBadge variant={currentQ.difficulty}>{currentQ.difficulty.toUpperCase()}</NeuBadge>
+                <NeuBadge variant={currentQ.difficulty === 'hard' ? 'medium' : currentQ.difficulty}>
+                  {currentQ.difficulty === 'easy' ? '🟢 Beginner' : currentQ.difficulty === 'medium' ? '🟡 Easy' : '🟠 Intermediate'}
+                </NeuBadge>
                 {isSolved && (
                   <span className="flex items-center gap-1 text-[11px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/30">
                     <CheckCircle2 size={12} />
@@ -257,6 +313,10 @@ export const CodingArena: React.FC<CodingArenaProps> = ({
 
             {/* Problem Statement */}
             <div>
+              <h3 className="text-xs font-bold font-mono uppercase text-[var(--neu-text-muted)] mb-1.5 tracking-wider">
+                Concept
+              </h3>
+              <p className="mb-4 text-sm text-[var(--neu-text-primary)]">{conceptName}</p>
               <h3 className="text-xs font-bold font-mono uppercase text-[var(--neu-text-muted)] mb-1.5 tracking-wider">
                 Problem Statement
               </h3>
@@ -291,40 +351,74 @@ export const CodingArena: React.FC<CodingArenaProps> = ({
               </div>
             </div>
 
-            {/* Sample Cases */}
+            {/* Visible Test Cases */}
             <div>
               <h3 className="text-xs font-semibold font-mono uppercase text-[var(--neu-text-muted)] mb-2">
-                Sample Test Cases
+                Test Cases
               </h3>
               <div className="flex flex-col gap-3">
-                {currentQ.sampleCases.map((sample, sIdx) => (
-                  <div key={sIdx} className="p-3.5 rounded-xl neu-inset flex flex-col gap-2">
+                {visibleTestCases.map((testCase, testIndex) => (
+                  <button type="button" key={`${testIndex}-${testCase.input}`}
+                    onClick={() => {
+                      setSelectedTestCaseIndex(testIndex);
+                      setCustomInput(testCase.input);
+                      setSelectedTestPassed(null);
+                      setCustomResult(null);
+                    }}
+                    className={`w-full rounded-xl border p-3.5 text-left ${selectedTestCaseIndex === testIndex ? 'border-[var(--neu-accent)]/60 bg-[var(--neu-accent)]/5' : 'border-[var(--neu-border)]'}`}>
                     <span className="text-[11px] font-mono font-semibold text-[var(--neu-accent)]">
-                      Sample {sIdx + 1}
+                      Test Case {testIndex + 1}{selectedTestCaseIndex === testIndex ? ' · Selected' : ''}
                     </span>
-                    <div className="grid grid-cols-2 gap-2 text-xs font-mono">
+                    <div className="mt-2 grid grid-cols-1 gap-2 text-xs font-mono sm:grid-cols-2">
                       <div>
-                        <span className="text-[10px] text-[var(--neu-text-muted)] block mb-0.5 font-semibold">Input:</span>
-                        <pre className="p-2 rounded-lg bg-black/20 dark:bg-black/30 text-slate-800 dark:text-slate-300 font-medium overflow-x-auto">
-                          {sample.input || '(empty)'}
-                        </pre>
+                        <span className="mb-0.5 block text-[10px] font-semibold text-[var(--neu-text-muted)]">Input:</span>
+                        <pre className="overflow-x-auto rounded-lg bg-black/10 p-2 dark:bg-black/30">{testCase.input || '(empty)'}</pre>
                       </div>
                       <div>
-                        <span className="text-[10px] text-[var(--neu-text-muted)] block mb-0.5 font-semibold">Output:</span>
-                        <pre className="p-2 rounded-lg bg-emerald-500/10 dark:bg-black/30 text-emerald-800 dark:text-emerald-400 font-semibold overflow-x-auto border border-emerald-500/20 dark:border-transparent">
-                          {sample.output}
-                        </pre>
+                        <span className="mb-0.5 block text-[10px] font-semibold text-[var(--neu-text-muted)]">Expected output:</span>
+                        <pre className="overflow-x-auto rounded-lg bg-emerald-500/10 p-2">{testCase.expectedOutput || '(empty)'}</pre>
                       </div>
                     </div>
-                    {sample.explanation && (
-                      <span className="text-[11px] text-[var(--neu-text-secondary)] italic">
-                        {sample.explanation}
-                      </span>
-                    )}
-                  </div>
+                  </button>
                 ))}
               </div>
             </div>
+
+            {currentQ.hints && (
+              <div className="rounded-xl border border-[var(--neu-border)] p-4">
+                <button type="button" onClick={() => setHintLevel((level) => Math.min(level + 1, currentQ.hints!.length))}
+                  disabled={hintLevel >= currentQ.hints.length}
+                  className="flex items-center gap-2 text-sm font-semibold text-[var(--neu-accent)] disabled:opacity-50">
+                  <Lightbulb size={15} />
+                  {hintLevel === 0 ? 'Need a Hint?' : hintLevel >= currentQ.hints.length ? 'All hints shown' : `Show Hint ${hintLevel + 1}`}
+                </button>
+                {hintLevel > 0 && <p className="mt-2 text-sm text-[var(--neu-text-secondary)]">{currentQ.hints[hintLevel - 1]}</p>}
+              </div>
+            )}
+
+            {currentQ.solution && (
+              <div className="rounded-xl border border-[var(--neu-border)] p-4">
+                <button type="button" onClick={() => setSolutionVisible((visible) => !visible)}
+                  className="text-sm font-semibold text-[var(--neu-accent)]">
+                  {solutionVisible ? 'Hide Solution' : 'View Solution'}
+                </button>
+                {solutionVisible && (
+                  <div className="mt-3 flex flex-col gap-3">
+                    <div>
+                      <h4 className="text-xs font-semibold uppercase text-[var(--neu-text-muted)]">Approach</h4>
+                      <ol className="mt-1 list-inside list-decimal text-sm text-[var(--neu-text-secondary)]">
+                        {currentQ.solution.approach.map((step) => <li key={step}>{step}</li>)}
+                      </ol>
+                    </div>
+                    <pre className="overflow-x-auto rounded-xl border p-3 text-xs leading-relaxed"
+                      style={{ backgroundColor: 'var(--code-box-bg)', color: 'var(--code-box-text)', borderColor: 'var(--code-box-border)' }}>
+                      <code>{currentQ.solution.code}</code>
+                    </pre>
+                    <p className="text-sm text-[var(--neu-text-secondary)]">{currentQ.solution.explanation}</p>
+                  </div>
+                )}
+              </div>
+            )}
           </NeuCard>
         </div>
 
@@ -409,11 +503,21 @@ export const CodingArena: React.FC<CodingArenaProps> = ({
                 <NeuButton
                   variant="secondary"
                   size="sm"
-                  onClick={handleRunCustom}
+                  onClick={handleRunTestCase}
                   disabled={isRunningCustom || isSubmitting}
                   icon={<Play size={14} />}
                 >
-                  {isRunningCustom ? 'Running...' : 'Run Custom'}
+                  {isRunningCustom ? 'Running...' : 'Run Code'}
+                </NeuButton>
+
+                <NeuButton
+                  variant="secondary"
+                  size="sm"
+                  onClick={handleRunCustom}
+                  disabled={isRunningCustom || isSubmitting}
+                  icon={<Terminal size={14} />}
+                >
+                  Run Custom
                 </NeuButton>
 
                 <NeuButton
@@ -484,10 +588,13 @@ export const CodingArena: React.FC<CodingArenaProps> = ({
                       ) : (
                         <>
                           <XCircle size={18} />
-                          <span>Wrong Answer / Runtime Check Failed</span>
+                          <span>Some tests did not pass. Check your logic and try another case.</span>
                         </>
                       )}
                     </div>
+                    {allPassed && (
+                      <p className="mt-2 text-xs font-medium">Great job! You solved this problem.</p>
+                    )}
                   </div>
                 )}
 
@@ -558,6 +665,15 @@ export const CodingArena: React.FC<CodingArenaProps> = ({
               <div className="flex flex-col gap-3 font-mono text-xs">
                 {customResult ? (
                   <>
+                    {selectedTestPassed !== null && (
+                      <div className={`rounded-xl border p-3 font-sans text-sm font-semibold ${
+                        selectedTestPassed
+                          ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-500'
+                          : 'border-rose-500/30 bg-rose-500/10 text-rose-500'
+                      }`}>
+                        {selectedTestPassed ? '✓ Test Case Passed' : '✗ Test Case Failed'}
+                      </div>
+                    )}
                     <div className="flex items-center justify-between text-[11px] text-[var(--neu-text-muted)] pb-1 border-b border-[var(--neu-border)]">
                       <span>Status: <strong className="text-[var(--neu-accent)] uppercase">{customResult.status}</strong></span>
                       {customResult.time && <span>Runtime: {customResult.time}</span>}
@@ -580,16 +696,37 @@ export const CodingArena: React.FC<CodingArenaProps> = ({
                         </pre>
                       </div>
                     )}
+                    {selectedTestPassed === false && (
+                      <div className="grid gap-2 sm:grid-cols-2">
+                        <div>
+                          <span className="text-[10px] text-[var(--neu-text-muted)] block mb-1">Expected:</span>
+                          <pre className="p-3 rounded-xl neu-inset whitespace-pre-wrap overflow-x-auto">{visibleTestCases[selectedTestCaseIndex]?.expectedOutput || '(empty)'}</pre>
+                        </div>
+                        <div>
+                          <span className="text-[10px] text-[var(--neu-text-muted)] block mb-1">Your output:</span>
+                          <pre className="p-3 rounded-xl neu-inset whitespace-pre-wrap overflow-x-auto">{customResult.stdout || '(empty)'}</pre>
+                        </div>
+                      </div>
+                    )}
                   </>
                 ) : (
                   <div className="py-8 text-center text-xs text-[var(--neu-text-muted)]">
-                    Click "Run Custom" to execute solution.c against your custom stdin.
+                    Choose a visible test case and click "Run Code", or run your own input with "Run Custom".
                   </div>
                 )}
               </div>
             )}
           </NeuCard>
         </div>
+      </div>
+
+      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--neu-border)] pt-4">
+        <NeuButton variant="secondary" size="sm" disabled={selectedQuestionIndex === 0}
+          onClick={() => setSelectedQuestionIndex((index) => Math.max(0, index - 1))}
+          icon={<ChevronLeft size={16} />}>Previous Problem</NeuButton>
+        <NeuButton variant="secondary" size="sm" disabled={selectedQuestionIndex === questions.length - 1}
+          onClick={() => setSelectedQuestionIndex((index) => Math.min(questions.length - 1, index + 1))}
+          icon={<ChevronRight size={16} />} iconPosition="right">Next Problem</NeuButton>
       </div>
     </div>
   );

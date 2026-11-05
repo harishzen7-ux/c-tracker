@@ -13,6 +13,44 @@ export interface LessonSection {
   annotation?: string;
   commonMistakes?: string[];
   quickRecap?: string[];
+  level?: 'Foundation' | 'Core Concepts' | 'Practice' | 'Intermediate';
+  keyPoint?: string;
+}
+
+export interface LessonExample {
+  title: string;
+  difficulty: 'Very Easy' | 'Easy' | 'Moderate' | 'Intermediate';
+  problem: string;
+  approach: string;
+  code: string;
+  expectedOutput: string;
+  explanation: string;
+}
+
+export interface PracticeQuestion {
+  title: string;
+  prompt: string;
+  difficulty: 'beginner' | 'easy' | 'intermediate';
+}
+
+export interface CommonMistake {
+  mistake: string;
+  why: string;
+  correctApproach: string;
+}
+
+export interface KnowledgeCheckQuestion {
+  question: string;
+  options: [string, string, string, string];
+  correctIndex: number;
+  explanation: string;
+}
+
+export interface OutputPredictionQuestion {
+  code: string;
+  options: [string, string, string, string];
+  correctIndex: number;
+  explanation: string;
 }
 
 export interface Lesson {
@@ -21,6 +59,25 @@ export interface Lesson {
   title: string;
   order: number;
   sections: LessonSection[];
+  startHere?: string;
+  examples?: LessonExample[];
+  practice?: {
+    beginner: PracticeQuestion[];
+    easy: PracticeQuestion[];
+    intermediate: PracticeQuestion[];
+  };
+  outputPredictions?: OutputPredictionQuestion[];
+  commonMistakes?: CommonMistake[];
+  quickCheck?: {
+    questions: KnowledgeCheckQuestion[];
+    outputPrediction: OutputPredictionQuestion;
+    codingQuestion: string;
+  };
+  completion?: {
+    learned: string[];
+    canNow: string[];
+    nextStep: string;
+  };
 }
 
 export interface MCQ {
@@ -60,6 +117,13 @@ export interface CodingQuestion {
   testCases: TestCase[];
   starterCode: string;
   solutionReference?: string;
+  concept?: string;
+  hints?: [string, string, string];
+  solution?: {
+    approach: string[];
+    code: string;
+    explanation: string;
+  };
 }
 
 export interface TopicMeta {

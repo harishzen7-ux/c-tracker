@@ -3,201 +3,136 @@ import { Lesson } from '../../../types';
 export const loopingLessons: Lesson = {
   id: 'lesson-looping',
   topicId: 'looping',
-  title: 'Looping and Iteration in C',
+  title: 'Looping in C',
   order: 4,
+  startHere: 'A loop repeats a block of code until its condition changes. Loops are useful for counting, adding a series of values, and processing repeated input. After this path, you can choose a loop, keep it under control, and build a small repeated task.',
   sections: [
     {
       id: 'sec-loop-for',
-      title: 'for Loop Mechanics & C99 Scope',
-      concept:
-        'The `for` loop is an entry-controlled loop ideal for determinate iterations. It bundles initialization, condition check, and step update into a single construct. In C99, loop counter variables can be declared directly within the initialization clause, scoping them strictly to the loop.',
-      syntax: `for (initialization; condition; increment/decrement) {\n    // loop body\n}`,
-      codeSnippet: `#include <stdio.h>
-
-int main() {
-    // C99: loop variable declared directly in header
-    for (int i = 1; i <= 5; i++) {
-        printf("Iteration %d, square = %d\\n", i, i * i);
-    }
-    
-    // Multiple loop variables in initialization and update
-    printf("Dual counters:\\n");
-    for (int left = 0, right = 10; left <= right; left++, right--) {
-        printf("left = %d, right = %d\\n", left, right);
-    }
-    
-    return 0;
-}`,
-      annotation:
-        'All three clauses of the for loop are optional: for (;;) { ... } creates an intentional infinite loop.',
-      commonMistakes: [
-        'Accidental semicolon after for loop header: for (int i = 0; i < 5; i++); { printf("%d", i); } runs the empty statement 5 times and then errors or prints once.',
-        'Off-by-one errors (using < vs <= or 0-indexed vs 1-indexed boundaries).',
-        'Modifying the loop index variable inside the loop body unexpectedly.',
-      ],
-      quickRecap: [
-        'for (init; cond; update) checks the condition BEFORE executing the body.',
-        'C99 allows loop-local variable declarations: for (int i = 0; ...)',
-        'for (;;) creates an infinite loop.',
-      ],
+      title: 'Foundation · Repeat a known number of times',
+      level: 'Foundation',
+      concept: 'A for loop groups a starting value, a condition, and an update. It is a good choice when you know how many repetitions you need.',
+      syntax: 'for (start; condition; update) {\n    // repeated work\n}',
+      codeSnippet: '#include <stdio.h>\n\nint main(void) {\n    for (int count = 1; count <= 3; count++) {\n        printf("%d\\n", count);\n    }\n    return 0;\n}',
+      keyPoint: 'Check the start and end values carefully to avoid one extra or one missing repetition.',
     },
     {
-      id: 'sec-loop-while-dowhile',
-      title: 'while & do-while Loops (Pre-test vs Post-test)',
-      concept:
-        '`while` is a pre-test loop that checks the condition prior to entering the body (executes 0 or more times). `do-while` is a post-test loop that executes the body at least once before testing the condition, making it ideal for menu prompts and user input validation.',
-      syntax: `while (condition) {\n    ...\n}\n\ndo {\n    ...\n} while (condition); // Notice required semicolon!`,
-      codeSnippet: `#include <stdio.h>
-
-int main() {
-    int count = 5;
-    printf("while countdown:\\n");
-    while (count > 0) {
-        printf("%d ", count);
-        count--;
-    }
-    printf("\\n");
-    
-    // do-while executes at least once even if condition starts false
-    int x = 100;
-    do {
-        printf("do-while executes at least once! x = %d\\n", x);
-    } while (x < 10); // Condition is false (100 < 10)
-    
-    return 0;
-}`,
-      annotation:
-        'The trailing semicolon in do { ... } while (condition); is mandatory.',
-      commonMistakes: [
-        'Forgetting the closing semicolon after while (cond); in a do-while loop.',
-        'Forgetting to update the loop condition variable inside a while loop, leading to an accidental infinite loop.',
-      ],
-      quickRecap: [
-        'while executes 0 or more times.',
-        'do-while executes 1 or more times.',
-        'do-while requires a semicolon after the while(...) clause.',
-      ],
+      id: 'sec-loop-while',
+      title: 'Core Concepts · Repeat while a condition is true',
+      level: 'Core Concepts',
+      concept: 'A while loop checks its condition before each repetition. It is useful when the number of repetitions depends on a value that changes.',
+      syntax: 'while (condition) {\n    // work\n    // update the condition value\n}',
+      codeSnippet: '#include <stdio.h>\n\nint main(void) {\n    int count = 3;\n    while (count > 0) {\n        printf("%d\\n", count);\n        count--;\n    }\n    return 0;\n}',
+      keyPoint: 'Update a value used in the condition so the loop can eventually stop.',
     },
     {
-      id: 'sec-loop-break-continue',
-      title: 'break and continue Loop Controls',
-      concept:
-        '`break` immediately terminates the innermost enclosing loop and transfers control outside. `continue` skips the remainder of the current iteration and jumps directly to the loop update/condition evaluation for the next iteration.',
-      syntax: `break;     // exit innermost loop immediately\ncontinue;  // skip to next iteration`,
-      codeSnippet: `#include <stdio.h>
-
-int main() {
-    printf("break example (stops at 5):\\n");
-    for (int i = 1; i <= 10; i++) {
-        if (i == 5) {
-            break; // Stop loop early
-        }
-        printf("%d ", i);
-    }
-    printf("\\n");
-    
-    printf("continue example (skips multiples of 3):\\n");
-    for (int i = 1; i <= 10; i++) {
-        if (i % 3 == 0) {
-            continue; // Skip rest of body and continue loop
-        }
-        printf("%d ", i);
-    }
-    printf("\\n");
-    
-    return 0;
-}`,
-      annotation:
-        'In a for loop, continue jumps to the increment step (i++), NOT the condition check.',
-      commonMistakes: [
-        'Calling continue in a while loop before incrementing the counter, causing an infinite loop because the counter is never updated!',
-        'Assuming break exits all nested loops (it only exits the innermost loop).',
-      ],
-      quickRecap: [
-        'break exits the enclosing loop completely.',
-        'continue skips to the next iteration.',
-        'In while loops, ensure the loop counter is incremented before continue.',
-      ],
+      id: 'sec-loop-controls',
+      title: 'Practice · Stop or skip a repetition',
+      level: 'Practice',
+      concept: 'break exits the nearest loop. continue skips the rest of the current repetition and moves to the next one.',
+      syntax: 'if (value == target) {\n    break;\n}\nif (value < 0) {\n    continue;\n}',
+      codeSnippet: '#include <stdio.h>\n\nint main(void) {\n    for (int number = 1; number <= 5; number++) {\n        if (number == 3) continue;\n        printf("%d ", number);\n    }\n    printf("\\n");\n    return 0;\n}',
+      keyPoint: 'Use break to finish a loop and continue to skip only one repetition.',
     },
     {
       id: 'sec-loop-nested',
-      title: 'Nested Loops & Matrix Traversal',
-      concept:
-        'A nested loop is a loop located inside another loop. For every single iteration of the outer loop, the inner loop executes its entire cycle of iterations. This is the cornerstone of 2D grid processing, matrix operations, and combinatorial searches.',
-      syntax: `for (int r = 0; r < rows; r++) {\n    for (int c = 0; c < cols; c++) {\n        // access matrix[r][c]\n    }\n}`,
-      codeSnippet: `#include <stdio.h>
-
-int main() {
-    int rows = 3, cols = 4;
-    
-    // Multiplication table grid (3 x 4)
-    for (int i = 1; i <= rows; i++) {
-        for (int j = 1; j <= cols; j++) {
-            printf("%3d", i * j);
-        }
-        printf("\\n"); // Newline after each row
-    }
-    
-    return 0;
-}`,
-      annotation:
-        'Total iterations for independent loops equals (outer count) * (inner count). Time complexity is O(N * M).',
-      commonMistakes: [
-        'Accidentally using the same loop variable (e.g. i) in both the outer and inner loops, breaking the outer loop\'s state.',
-        'Putting the newline printf("\\n") inside the inner loop rather than the outer loop.',
-      ],
-      quickRecap: [
-        'Inner loop runs to completion for every single step of outer loop.',
-        'Always use distinct variable names (i, j, k) for nested counters.',
-      ],
-    },
-    {
-      id: 'sec-loop-patterns',
-      title: 'Pattern Printing Logic',
-      concept:
-        'Pattern printing develops spatial and mathematical reasoning in C. Outer loops control rows (vertical position), while inner loops control columns (horizontal position: spaces and symbols like asterisks).',
-      syntax: `for (int i = 1; i <= N; i++) {\n    for (int j = 1; j <= i; j++) {\n        printf("* ");\n    }\n    printf("\\n");\n}`,
-      codeSnippet: `#include <stdio.h>
-
-int main() {
-    int n = 4;
-    
-    // Right triangle
-    printf("Right Triangle:\\n");
-    for (int i = 1; i <= n; i++) {
-        for (int j = 1; j <= i; j++) {
-            printf("* ");
-        }
-        printf("\\n");
-    }
-    
-    // Number pyramid
-    printf("\\nNumber Pyramid:\\n");
-    for (int i = 1; i <= n; i++) {
-        // Leading spaces
-        for (int s = 1; s <= n - i; s++) {
-            printf(" ");
-        }
-        // Numbers
-        for (int j = 1; j <= i; j++) {
-            printf("%d ", j);
-        }
-        printf("\\n");
-    }
-    
-    return 0;
-}`,
-      annotation:
-        'Formula for inverted rows is often (N - i + 1) or (2 * i - 1) for odd-count pyramids.',
-      commonMistakes: [
-        'Mixing 0-indexed and 1-indexed pattern loop counters, producing skewed geometries.',
-        'Forgetting trailing newlines between pattern lines.',
-      ],
-      quickRecap: [
-        'Outer loop controls row index i.',
-        'Inner loops print spaces and characters for the current row.',
-        'Derive mathematical relationships between row index i and column count.',
-      ],
+      title: 'Intermediate · Put one loop inside another',
+      level: 'Intermediate',
+      concept: 'A nested loop places a loop inside another loop. The inner loop repeats fully for each run of the outer loop, which is useful for simple tables and row-based patterns.',
+      syntax: 'for (int row = 1; row <= rows; row++) {\n    for (int column = 1; column <= columns; column++) {\n        // work for this position\n    }\n}',
+      codeSnippet: '#include <stdio.h>\n\nint main(void) {\n    for (int row = 1; row <= 2; row++) {\n        for (int column = 1; column <= 3; column++) {\n            printf("* ");\n        }\n        printf("\\n");\n    }\n    return 0;\n}',
+      keyPoint: 'Use different variable names for the outer and inner counters.',
     },
   ],
+  examples: [
+    {
+      title: 'Example 1 — Very Easy',
+      difficulty: 'Very Easy',
+      problem: 'Print the numbers from 1 through 5.',
+      approach: 'Start a counter at 1, continue while it is at most 5, and increase it each time.',
+      code: '#include <stdio.h>\n\nint main(void) {\n    for (int number = 1; number <= 5; number++) {\n        printf("%d ", number);\n    }\n    printf("\\n");\n    return 0;\n}',
+      expectedOutput: '1 2 3 4 5',
+      explanation: 'The condition is checked before each run, and number++ moves to the next value.',
+    },
+    {
+      title: 'Example 2 — Easy',
+      difficulty: 'Easy',
+      problem: 'Read N and print the sum from 1 through N.',
+      approach: 'Start sum at zero and add each counter value during the loop.',
+      code: '#include <stdio.h>\n\nint main(void) {\n    int n, sum = 0;\n    scanf("%d", &n);\n    for (int number = 1; number <= n; number++) {\n        sum += number;\n    }\n    printf("Sum = %d\\n", sum);\n    return 0;\n}',
+      expectedOutput: 'Input: 4\nOutput: Sum = 10',
+      explanation: 'The loop adds 1, 2, 3, and 4 to sum.',
+    },
+    {
+      title: 'Example 3 — Moderate',
+      difficulty: 'Moderate',
+      problem: 'Print the first five multiples of a number.',
+      approach: 'Repeat a counter from 1 to 5 and print number times counter.',
+      code: '#include <stdio.h>\n\nint main(void) {\n    int number;\n    scanf("%d", &number);\n    for (int multiplier = 1; multiplier <= 5; multiplier++) {\n        printf("%d\\n", number * multiplier);\n    }\n    return 0;\n}',
+      expectedOutput: 'Input: 3\nOutput:\n3\n6\n9\n12\n15',
+      explanation: 'Each iteration uses the next multiplier and displays one product.',
+    },
+    {
+      title: 'Example 4 — Intermediate',
+      difficulty: 'Intermediate',
+      problem: 'Read five integers and count how many are positive.',
+      approach: 'Use a loop for five inputs and increase a counter when a value is greater than zero.',
+      code: '#include <stdio.h>\n\nint main(void) {\n    int value, positiveCount = 0;\n    for (int item = 0; item < 5; item++) {\n        scanf("%d", &value);\n        if (value > 0) {\n            positiveCount++;\n        }\n    }\n    printf("Positive values = %d\\n", positiveCount);\n    return 0;\n}',
+      expectedOutput: 'Input: 2 -1 0 7 3\nOutput: Positive values = 3',
+      explanation: 'The loop handles one input per repetition; the if statement counts only positive values.',
+    },
+  ],
+  practice: {
+    beginner: [
+      { title: 'Count to N', prompt: 'Read a positive integer N and print the numbers from 1 to N.', difficulty: 'beginner' },
+      { title: 'Countdown', prompt: 'Read a positive integer N and print down to 1.', difficulty: 'beginner' },
+    ],
+    easy: [
+      { title: 'Sum from 1 to N', prompt: 'Read N and use a loop to find 1 + 2 + ... + N.', difficulty: 'easy' },
+      { title: 'Multiplication table', prompt: 'Read a number and print its first five multiples, one per line.', difficulty: 'easy' },
+    ],
+    intermediate: [
+      { title: 'Count even values', prompt: 'Read N followed by N integers. Use a loop to count how many are even.', difficulty: 'intermediate' },
+      { title: 'Small rectangle', prompt: 'Read rows and columns (both between 1 and 5) and print a rectangle of stars using nested loops.', difficulty: 'intermediate' },
+    ],
+  },
+  outputPredictions: [
+    {
+      code: '#include <stdio.h>\nint main(void) {\n    for (int i = 1; i <= 3; i++) printf("%d ", i);\n    return 0;\n}',
+      options: ['1 2 3', '0 1 2', '1 2', '3 3 3'],
+      correctIndex: 0,
+      explanation: 'The loop runs for i equal to 1, 2, and 3.',
+    },
+    {
+      code: '#include <stdio.h>\nint main(void) {\n    int count = 0;\n    while (count < 2) {\n        printf("%d ", count);\n        count++;\n    }\n    return 0;\n}',
+      options: ['0 1', '1 2', '0 1 2', 'Infinite loop'],
+      correctIndex: 0,
+      explanation: 'The counter is printed as 0 and 1, then it becomes 2 and the condition is false.',
+    },
+  ],
+  commonMistakes: [
+    { mistake: 'Forgetting to update the while-loop counter.', why: 'The condition may stay true forever.', correctApproach: 'Change the value used by the condition inside the loop.' },
+    { mistake: 'Using < when the endpoint should be included.', why: 'The final intended value is skipped.', correctApproach: 'Use <= when counting through an inclusive endpoint.' },
+    { mistake: 'Putting a semicolon after a for-loop header.', why: 'The semicolon makes the loop body empty.', correctApproach: 'Place the loop body directly after the closing parenthesis.' },
+    { mistake: 'Using the same counter name in nested loops.', why: 'The inner loop can overwrite the outer loop counter.', correctApproach: 'Use separate names such as row and column.' },
+  ],
+  quickCheck: {
+    questions: [
+      { question: 'Which loop is often clearest when the repeat count is known?', options: ['for', 'if', 'switch', 'return'], correctIndex: 0, explanation: 'A for loop puts initialization, condition, and update together.' },
+      { question: 'What does continue do?', options: ['Ends the program', 'Skips to the next loop iteration', 'Exits every loop', 'Repeats the same value forever'], correctIndex: 1, explanation: 'continue skips the remaining body for the current iteration.' },
+      { question: 'What must usually change in a while loop?', options: ['The header file', 'A value used by its condition', 'The function name', 'The return type'], correctIndex: 1, explanation: 'Updating the condition value helps the loop eventually stop.' },
+    ],
+    outputPrediction: {
+      code: '#include <stdio.h>\nint main(void) {\n    int total = 0;\n    for (int i = 1; i <= 3; i++) total += i;\n    printf("%d\\n", total);\n    return 0;\n}',
+      options: ['3', '5', '6', '123'],
+      correctIndex: 2,
+      explanation: 'The loop adds 1 + 2 + 3, which equals 6.',
+    },
+    codingQuestion: 'Read a positive integer N and print the sum of all even numbers from 1 to N.',
+  },
+  completion: {
+    learned: ['for loops', 'while loops', 'break and continue', 'Nested loops'],
+    canNow: ['Repeat a task safely', 'Count and accumulate values', 'Process a small set of inputs', 'Write a simple nested-loop pattern'],
+    nextStep: 'Continue to another topic or revisit practice with your own input values.',
+  },
 };

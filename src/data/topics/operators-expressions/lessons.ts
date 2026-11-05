@@ -5,196 +5,134 @@ export const operatorsLessons: Lesson = {
   topicId: 'operators-expressions',
   title: 'Operators and Expressions in C',
   order: 2,
+  startHere: 'Operators let C perform calculations and comparisons. You will use them to update values, make decisions, and build expressions. After this path, you can calculate with integers and decimals, compare values, and read the order of a simple expression.',
   sections: [
     {
       id: 'sec-op-arithmetic',
-      title: 'Arithmetic & Assignment Operators',
-      concept:
-        'C supports five primary binary arithmetic operators: addition (+), subtraction (-), multiplication (*), division (/), and modulo (%). Integer division truncates towards zero (e.g., 7 / 2 evaluates to 3). Modulo (%) yields the remainder of integer division and is undefined for floating-point operands.',
-      syntax: `result = operand1 + operand2;\na += 5; // Compound assignment: a = a + 5;`,
-      codeSnippet: `#include <stdio.h>
-
-int main() {
-    int a = 14, b = 4;
-    printf("Addition:       %d + %d = %d\\n", a, b, a + b);
-    printf("Subtraction:    %d - %d = %d\\n", a, b, a - b);
-    printf("Multiplication: %d * %d = %d\\n", a, b, a * b);
-    printf("Integer Div:    %d / %d = %d\\n", a, b, a / b);
-    printf("Modulo:         %d %% %d = %d\\n", a, b, a % b);
-    
-    // Float division requires at least one float operand
-    float precise = (float)a / b;
-    printf("Float Div:      %.2f\\n", precise);
-    
-    return 0;
-}`,
-      annotation:
-        'Notice how (float)a / b forces floating-point division rather than integer truncation.',
-      commonMistakes: [
-        'Attempting to use the modulo operator (%) on float or double operands, which triggers a compile error (use fmod() from <math.h> instead).',
-        'Division by zero (e.g. 5 / 0), causing an immediate SIGFPE runtime crash.',
-        'Assuming integer division 1 / 2 yields 0.5 instead of 0.',
-      ],
-      quickRecap: [
-        'Integer division truncates decimals toward zero.',
-        'Modulo (%) requires integer operands on both sides.',
-        'Compound operators (+=, *=) evaluate RHS first before assignment.',
-      ],
+      title: 'Foundation · Arithmetic operators',
+      level: 'Foundation',
+      concept: 'Arithmetic operators perform calculations: + adds, - subtracts, * multiplies, / divides, and % gives the integer remainder.',
+      syntax: 'sum = first + second;\nremainder = number % 2;',
+      codeSnippet: '#include <stdio.h>\n\nint main(void) {\n    int first = 14;\n    int second = 4;\n    printf("%d %d\\n", first + second, first % second);\n    return 0;\n}',
+      keyPoint: 'When both operands are int, / drops the fractional part.',
     },
     {
-      id: 'sec-op-relational-logical',
-      title: 'Relational & Logical Operators (Short-Circuit Evaluation)',
-      concept:
-        'Relational operators (<, <=, >, >=, ==, !=) yield 1 for true and 0 for false. Logical operators (&& for AND, || for OR, ! for NOT) operate on truth values. In C, 0 is false and any non-zero value is true. C guarantees short-circuit evaluation: in A && B, if A is 0, B is never evaluated; in A || B, if A is non-zero, B is never evaluated.',
-      syntax: `condition1 && condition2\ncondition1 || condition2\n!condition`,
-      codeSnippet: `#include <stdio.h>
-
-int main() {
-    int x = 0, y = 10;
-    
-    // Short-circuit: ++y is NEVER executed because x is 0 (false)
-    if (x && ++y) {
-        printf("Branch taken\\n");
-    }
-    printf("After && short-circuit: y = %d\\n", y); // y is still 10!
-    
-    int a = 1, b = 20;
-    // Short-circuit: ++b is NEVER executed because a is 1 (true)
-    if (a || ++b) {
-        printf("Logical OR passed\\n");
-    }
-    printf("After || short-circuit: b = %d\\n", b); // b is still 20!
-    
-    return 0;
-}`,
-      annotation:
-        'Short-circuit evaluation is a foundational C guarantee used to safely guard pointers, e.g., if (ptr != NULL && *ptr > 0).',
-      commonMistakes: [
-        'Confusing assignment = with relational equality == (e.g. if (x = 5) always evaluates to true).',
-        'Confusing logical operators &&, || with bitwise operators &, |.',
-        'Writing chained comparisons like 1 < x < 10. In C, (1 < x) evaluates to 0 or 1, which is then compared against 10 (always true!).',
-      ],
-      quickRecap: [
-        'Relational expressions produce integers 0 or 1.',
-        '&& stops immediately if LHS is 0.',
-        '|| stops immediately if LHS is non-zero.',
-      ],
+      id: 'sec-op-comparison',
+      title: 'Core Concepts · Compare and combine conditions',
+      level: 'Core Concepts',
+      concept: 'Comparison operators such as ==, !=, <, and >= produce true (1) or false (0). Use && for both conditions and || when either condition may be true.',
+      syntax: 'if (age >= 18 && hasId == 1) {\n    printf("Allowed\\n");\n}',
+      codeSnippet: '#include <stdio.h>\n\nint main(void) {\n    int score = 75;\n    printf("%d\\n", score >= 60);\n    return 0;\n}',
+      keyPoint: 'Use == to compare two values; a single = assigns a value.',
     },
     {
-      id: 'sec-op-bitwise',
-      title: 'Bitwise Operators & Bit Manipulation',
-      concept:
-        'Bitwise operators work directly on the individual binary bits of integer data types: AND (&), OR (|), XOR (^), NOT/One\'s Complement (~), Left Shift (<<), and Right Shift (>>). Left shifting x << n is equivalent to multiplying by 2^n. Right shifting unsigned integers x >> n divides by 2^n.',
-      syntax: `mask = (1 << bitPosition);\nnumber |= mask;   // Set bit\nnumber &= ~mask;  // Clear bit\nnumber ^= mask;   // Toggle bit`,
-      codeSnippet: `#include <stdio.h>
-
-int main() {
-    unsigned char a = 0x0F; // 0000 1111 (15)
-    unsigned char b = 0x33; // 0011 0011 (51)
-    
-    printf("a & b  = 0x%02X\\n", a & b); // 0000 0011 (0x03)
-    printf("a | b  = 0x%02X\\n", a | b); // 0011 1111 (0x3F)
-    printf("a ^ b  = 0x%02X\\n", a ^ b); // 0011 1100 (0x3C)
-    printf("~a     = 0x%02X\\n", (unsigned char)~a); // 1111 0000 (0xF0)
-    printf("a << 2 = 0x%02X\\n", (unsigned char)(a << 2)); // 0011 1100 (0x3C)
-    printf("b >> 2 = 0x%02X\\n", (unsigned char)(b >> 2)); // 0000 1100 (0x0C)
-    
-    // Check if 3rd bit of number 13 (1101) is set
-    int n = 13;
-    int isSet = (n & (1 << 3)) != 0;
-    printf("Bit 3 of %d is %s\\n", n, isSet ? "SET" : "CLEARED");
-    
-    return 0;
-}`,
-      annotation:
-        'Bit shifting negative numbers or shifting by >= bit-width produces undefined behavior in standard C.',
-      commonMistakes: [
-        'Shifting by an amount greater than or equal to the width of the type (e.g. 1ULL << 64 on 64-bit uint) causes undefined behavior.',
-        'Assuming right shift (>>) of signed negative numbers always zero-fills; in C99, right shift of signed negative numbers is implementation-defined (arithmetic vs logical shift).',
-      ],
-      quickRecap: [
-        '&: both bits must be 1; |: either bit 1; ^: bits must differ.',
-        'Left shift x << k multiplies by 2^k.',
-        'Always use unsigned types for predictable bitwise operations.',
-      ],
+      id: 'sec-op-assignment',
+      title: 'Core Concepts · Update a variable',
+      level: 'Core Concepts',
+      concept: 'Assignment stores a value in a variable. Compound assignments such as += combine a calculation with storing the result.',
+      syntax: 'count = count + 1;\ncount += 1;',
+      codeSnippet: '#include <stdio.h>\n\nint main(void) {\n    int points = 10;\n    points += 3;\n    printf("%d\\n", points);\n    return 0;\n}',
+      keyPoint: 'The shorter form points += 3 means points = points + 3.',
     },
     {
-      id: 'sec-op-unary-ternary',
-      title: 'Unary, sizeof, and Ternary (?:) Operators',
-      concept:
-        'Unary operators operate on a single operand: prefix/postfix increment (++), decrement (--), unary minus (-), address-of (&), indirection (*), and sizeof. `sizeof` is evaluated at compile time (except for variable-length arrays) and returns the size in bytes as `size_t`. The ternary conditional operator (condition ? expr1 : expr2) evaluates only one branch.',
-      syntax: `++x (pre-increment); x++ (post-increment);\nsize_t bytes = sizeof(type);\nmax = (a > b) ? a : b;`,
-      codeSnippet: `#include <stdio.h>
-
-int main() {
-    int x = 5;
-    int pre = ++x;  // x becomes 6, pre is 6
-    int post = x++; // post is 6, x becomes 7
-    printf("x = %d, pre = %d, post = %d\\n", x, pre, post);
-    
-    // sizeof yields size in bytes
-    printf("sizeof(int):    %zu\\n", sizeof(int));
-    printf("sizeof(double): %zu\\n", sizeof(double));
-    
-    int arr[10];
-    printf("Elements in arr: %zu\\n", sizeof(arr) / sizeof(arr[0]));
-    
-    // Ternary operator
-    int a = 15, b = 25;
-    int larger = (a > b) ? a : b;
-    printf("Larger of %d and %d is %d\\n", a, b, larger);
-    
-    return 0;
-}`,
-      annotation:
-        'Note that sizeof does not evaluate expressions inside it at runtime: sizeof(i++) does not increment i!',
-      commonMistakes: [
-        'Writing i = i++ or multiple modifications in one expression (undefined behavior).',
-        'Expecting sizeof(ptr) to return the allocated array size when passed into a function (arrays decay to pointers).',
-      ],
-      quickRecap: [
-        'Prefix (++x) increments before value is used; postfix (x++) increments after.',
-        'sizeof is a compile-time operator that returns size_t.',
-        'Ternary conditional executes only the chosen branch.',
-      ],
-    },
-    {
-      id: 'sec-op-precedence',
-      title: 'Precedence, Associativity & Type Casting',
-      concept:
-        'Operator precedence dictates the order in which operators are grouped in an expression without parentheses. Associativity specifies whether operators of identical precedence group Left-to-Right or Right-to-Left. Type casting allows implicit (widening) or explicit conversion.',
-      syntax: `(target_type)expression\nPrecedence: Postfix > Unary > Multiplicative > Additive > Shift > Relational > Equality > Bitwise > Logical > Ternary > Assignment`,
-      codeSnippet: `#include <stdio.h>
-
-int main() {
-    // * has higher precedence than +
-    int res = 2 + 3 * 4; // 2 + 12 = 14, not 20!
-    printf("2 + 3 * 4 = %d\\n", res);
-    
-    // Assignment is right-to-left
-    int x, y, z;
-    x = y = z = 10;
-    printf("x = %d, y = %d, z = %d\\n", x, y, z);
-    
-    // Type conversion
-    int a = 5, b = 2;
-    double d1 = a / b;          // 5 / 2 = 2, then promoted to 2.0
-    double d2 = (double)a / b;  // 5.0 / 2 = 2.5
-    printf("d1 = %.1f, d2 = %.1f\\n", d1, d2);
-    
-    return 0;
-}`,
-      annotation:
-        'When in doubt, use explicit parentheses: (a & (1 << i)) is clearer and safer than relying on bitwise precedence.',
-      commonMistakes: [
-        'Bitwise operators (&, |, ^) have LOWER precedence than relational equality (==, !=). if (x & 1 == 0) groups as if (x & (1 == 0))!',
-        'Casting after division: (float)(5 / 2) still evaluates to 2.0, because 5/2 happens in integer arithmetic first.',
-      ],
-      quickRecap: [
-        'Always wrap bitwise expressions in parentheses when comparing: (x & 1) == 0.',
-        'Cast operands before division to preserve fractional precision.',
-        'Assignment and ternary associate right-to-left; arithmetic associates left-to-right.',
-      ],
+      id: 'sec-op-expressions',
+      title: 'Intermediate · Order and type in expressions',
+      level: 'Intermediate',
+      concept: 'Parentheses make calculation order clear. Casting one integer to float before division keeps a decimal result.',
+      syntax: 'average = (float)total / count;',
+      codeSnippet: '#include <stdio.h>\n\nint main(void) {\n    int total = 7;\n    int count = 2;\n    printf("%.1f\\n", (float)total / count);\n    return 0;\n}',
+      keyPoint: 'Use parentheses and an explicit cast when the intended order or result type is not obvious.',
     },
   ],
+  examples: [
+    {
+      title: 'Example 1 — Very Easy',
+      difficulty: 'Very Easy',
+      problem: 'Add two values that are already stored in the program.',
+      approach: 'Use + inside printf.',
+      code: '#include <stdio.h>\n\nint main(void) {\n    int apples = 3;\n    int oranges = 2;\n    printf("%d\\n", apples + oranges);\n    return 0;\n}',
+      expectedOutput: '5',
+      explanation: 'The + operator adds the two integer values.',
+    },
+    {
+      title: 'Example 2 — Easy',
+      difficulty: 'Easy',
+      problem: 'Read a number and check whether it is even.',
+      approach: 'An even number has remainder 0 when divided by 2.',
+      code: '#include <stdio.h>\n\nint main(void) {\n    int number;\n    scanf("%d", &number);\n    printf("%d\\n", number % 2 == 0);\n    return 0;\n}',
+      expectedOutput: 'Input: 8\nOutput: 1',
+      explanation: 'The comparison is true, so C prints 1.',
+    },
+    {
+      title: 'Example 3 — Moderate',
+      difficulty: 'Moderate',
+      problem: 'Read two quiz scores and print their average with a decimal.',
+      approach: 'Add the scores, cast the total to float, and divide by 2.',
+      code: '#include <stdio.h>\n\nint main(void) {\n    int firstScore, secondScore;\n    scanf("%d %d", &firstScore, &secondScore);\n    printf("%.1f\\n", (float)(firstScore + secondScore) / 2);\n    return 0;\n}',
+      expectedOutput: 'Input: 7 8\nOutput: 7.5',
+      explanation: 'Casting before division prevents integer division from dropping the .5.',
+    },
+    {
+      title: 'Example 4 — Intermediate',
+      difficulty: 'Intermediate',
+      problem: 'Read a price and quantity and calculate the total after a fixed discount.',
+      approach: 'Multiply price by quantity, then subtract the discount.',
+      code: '#include <stdio.h>\n\nint main(void) {\n    int price, quantity, discount;\n    scanf("%d %d %d", &price, &quantity, &discount);\n    int total = price * quantity - discount;\n    printf("Total = %d\\n", total);\n    return 0;\n}',
+      expectedOutput: 'Input: 12 3 5\nOutput: Total = 31',
+      explanation: 'Multiplication and subtraction combine in one expression; the named total makes the steps easy to read.',
+    },
+  ],
+  practice: {
+    beginner: [
+      { title: 'Add two numbers', prompt: 'Read two integers and print their sum.', difficulty: 'beginner' },
+      { title: 'Find a remainder', prompt: 'Read an integer and print its remainder when divided by 5.', difficulty: 'beginner' },
+    ],
+    easy: [
+      { title: 'Even or odd', prompt: 'Read an integer and print EVEN if it is divisible by 2; otherwise print ODD.', difficulty: 'easy' },
+      { title: 'Compare two scores', prompt: 'Read two scores and print 1 if the first is greater, otherwise print 0.', difficulty: 'easy' },
+    ],
+    intermediate: [
+      { title: 'Average with decimals', prompt: 'Read three integer marks and print their average with one digit after the decimal point.', difficulty: 'intermediate' },
+      { title: 'Update a balance', prompt: 'Read a starting balance and a deposit, add them using a compound assignment, and print the result.', difficulty: 'intermediate' },
+    ],
+  },
+  outputPredictions: [
+    {
+      code: '#include <stdio.h>\nint main(void) {\n    printf("%d\\n", 9 / 2);\n    return 0;\n}',
+      options: ['4', '4.5', '5', '2'],
+      correctIndex: 0,
+      explanation: 'Both values are integers, so integer division drops the fractional part.',
+    },
+    {
+      code: '#include <stdio.h>\nint main(void) {\n    int value = 5;\n    value += 2;\n    printf("%d\\n", value);\n    return 0;\n}',
+      options: ['5', '2', '7', '52'],
+      correctIndex: 2,
+      explanation: 'value += 2 adds 2 to the current value and stores 7.',
+    },
+  ],
+  commonMistakes: [
+    { mistake: 'Using = when you mean ==.', why: '= changes a variable; == compares two values.', correctApproach: 'Use == in a condition when checking equality.' },
+    { mistake: 'Expecting 7 / 2 to produce 3.5.', why: 'Both operands are integers, so C performs integer division.', correctApproach: 'Convert an operand to float before dividing for a decimal result.' },
+    { mistake: 'Using % with decimal values.', why: 'The remainder operator works with integer operands.', correctApproach: 'Use integer values for remainders; keep decimal calculations with /.' },
+    { mistake: 'Writing a long expression without grouping.', why: 'Operator precedence can make the calculation hard to follow.', correctApproach: 'Add parentheses to show the intended calculation order.' },
+  ],
+  quickCheck: {
+    questions: [
+      { question: 'What does 11 % 4 evaluate to?', options: ['2', '3', '2.75', '4'], correctIndex: 1, explanation: '11 divided by 4 leaves a remainder of 3.' },
+      { question: 'Which operator checks whether two values are equal?', options: ['=', '==', '+=', '!='], correctIndex: 1, explanation: '== compares values; = assigns.' },
+      { question: 'Which change helps 7 / 2 produce a decimal?', options: ['Use 7 % 2', 'Cast one operand to float', 'Use ==', 'Remove parentheses'], correctIndex: 1, explanation: 'A floating-point operand makes the division produce a decimal result.' },
+    ],
+    outputPrediction: {
+      code: '#include <stdio.h>\nint main(void) {\n    int x = 4;\n    printf("%d\\n", x * 2 + 1);\n    return 0;\n}',
+      options: ['9', '12', '10', '7'],
+      correctIndex: 0,
+      explanation: 'Multiplication happens first: 4 * 2 is 8, then 1 is added.',
+    },
+    codingQuestion: 'Write a program that reads two integers and prints their sum, product, and remainder.',
+  },
+  completion: {
+    learned: ['Arithmetic and remainder', 'Comparison and logical operators', 'Compound assignment', 'Expression order and type conversion'],
+    canNow: ['Calculate with C operators', 'Compare values', 'Avoid integer-division surprises', 'Write clear simple expressions'],
+    nextStep: 'Continue to Decision Making to use conditions to choose what a program does.',
+  },
 };
