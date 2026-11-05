@@ -400,12 +400,12 @@ export const CodingArena: React.FC<CodingArenaProps> = ({
             </div>
 
             {/* Action Buttons: Run vs Submit */}
-            <div className="flex items-center justify-between gap-4 pt-2">
+            <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
               <span className="text-[11px] font-mono text-[var(--neu-text-muted)]">
                 Auto-saved in browser
               </span>
 
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-2">
                 <NeuButton
                   variant="secondary"
                   size="sm"

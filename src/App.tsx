@@ -13,20 +13,14 @@ import { ProtectedRoute } from './services/ProtectedRoute';
 
 function MainApp() {
   const [theme, setTheme] = useState<'dark' | 'light'>(() => storageService.getTheme());
-  const [streak, setStreak] = useState<number>(() => storageService.getStreak());
   const { currentUser, profile } = useAuth();
 
   // Initialize storage for current authenticated user
   useEffect(() => {
-    storageService.initForUser(currentUser?.uid || null).then(() => {
-      setStreak(storageService.getStreak());
+    const uid = currentUser?.uid || null;
+    storageService.initForUser(uid).then(() => {
+      if (uid) storageService.recordLogin();
     });
-
-    const unsubscribe = storageService.subscribe(() => {
-      setStreak(storageService.getStreak());
-    });
-
-    return () => unsubscribe();
   }, [currentUser]);
 
   useEffect(() => {
@@ -39,8 +33,8 @@ function MainApp() {
     }
   }, [theme]);
 
-  const handleThemeToggle = () => {
-    const nextTheme = theme === 'dark' ? 'light' : 'dark';
+  const handleThemeChange = (nextTheme: 'dark' | 'light') => {
+    if (nextTheme === theme) return;
     setTheme(nextTheme);
     storageService.setTheme(nextTheme);
   };
@@ -49,7 +43,10 @@ function MainApp() {
     <div className="min-h-screen flex flex-col bg-[var(--neu-base)] text-[var(--neu-text-primary)] transition-colors duration-200">
       <Routes>
         {/* PUBLIC ROUTE 1: Landing page */}
-        <Route path="/" element={<LandingPage />} />
+        <Route
+          path="/"
+          element={<LandingPage theme={theme} onThemeChange={handleThemeChange} />}
+        />
 
         {/* PUBLIC ROUTE 2 & 3: Auth pages */}
         <Route path="/login" element={<LoginPage />} />
@@ -63,8 +60,7 @@ function MainApp() {
               <>
                 <Navbar
                   theme={theme}
-                  onThemeToggle={handleThemeToggle}
-                  streak={streak}
+                  onThemeChange={handleThemeChange}
                 />
                 <main className="flex-1">
                   <DashboardPage />
@@ -82,8 +78,7 @@ function MainApp() {
               <>
                 <Navbar
                   theme={theme}
-                  onThemeToggle={handleThemeToggle}
-                  streak={streak}
+                  onThemeChange={handleThemeChange}
                 />
                 <main className="flex-1">
                   <TopicPage />

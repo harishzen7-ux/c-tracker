@@ -98,7 +98,7 @@ export const TopicPage: React.FC = () => {
       </div>
 
       {/* Topic Hero Banner */}
-      <div className="p-6 sm:p-8 rounded-2xl neu-raised flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div className="p-6 sm:p-8 rounded-2xl neu-raised flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div>
           <span className="text-xs font-mono uppercase tracking-wider text-[var(--neu-accent)] font-semibold">
             Topic {topicMeta.order} of 4
@@ -112,7 +112,7 @@ export const TopicPage: React.FC = () => {
         </div>
 
         {/* Tab Switcher Segmented Control */}
-        <div className="shrink-0">
+        <div className="w-full min-w-0 lg:w-auto lg:shrink-0">
           <NeuSegmented
             options={tabOptions}
             activeId={activeTab}

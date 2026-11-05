@@ -92,6 +92,7 @@ export interface UserProgress {
     count: number;
     lastActiveDate: string;
   };
+  loginStreakVersion: number;
   theme: 'dark' | 'light';
   timerEnabled: boolean;
 }

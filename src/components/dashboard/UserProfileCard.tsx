@@ -1,8 +1,10 @@
 import React from 'react';
+import { Flame } from 'lucide-react';
 import { NeuCard } from '../common/NeuCard';
 import { NeuButton } from '../common/NeuButton';
 
 interface UserProfileCardProps {
+  userName: string;
   totalSolved: number;
   totalMastered: number;
   streak: number;
@@ -10,6 +12,7 @@ interface UserProfileCardProps {
 }
 
 export const UserProfileCard: React.FC<UserProfileCardProps> = ({
+  userName,
   totalSolved,
   totalMastered,
   streak,
@@ -22,7 +25,7 @@ export const UserProfileCard: React.FC<UserProfileCardProps> = ({
         <div className="relative w-18 h-18 sm:w-20 sm:h-20 rounded-full neu-raised flex items-center justify-center p-1.5 shrink-0">
           <div className="w-full h-full rounded-full neu-inset flex items-center justify-center border-2 border-[var(--neu-accent)]/50 shadow-[0_0_12px_var(--neu-accent-glow)]">
             <span className="text-xl sm:text-2xl font-bold font-mono text-[var(--neu-accent)]">
-              C99
+              {userName.trim().charAt(0).toUpperCase()}
             </span>
           </div>
           <span
@@ -35,7 +38,7 @@ export const UserProfileCard: React.FC<UserProfileCardProps> = ({
         <div>
           <div className="flex items-center justify-center sm:justify-start gap-2">
             <h2 className="text-lg sm:text-xl font-bold text-[var(--neu-text-primary)]">
-              Developer Candidate
+              {userName}
             </h2>
             <span className="text-[11px] font-mono text-[var(--neu-accent)] px-2 py-0.5 rounded-full neu-inset">
               Level 1
@@ -54,16 +57,30 @@ export const UserProfileCard: React.FC<UserProfileCardProps> = ({
             <span className="text-[var(--neu-text-primary)] font-semibold">
               <span className="text-amber-500 font-bold">{totalMastered}/4</span> Topics Mastered
             </span>
-            <span aria-hidden="true">·</span>
-            <span className="text-[var(--neu-text-primary)] font-semibold">
-              <span className="text-[var(--neu-accent)] font-bold">{streak}</span> Day Streak
-            </span>
           </div>
         </div>
       </div>
 
-      {/* Primary orange pill button */}
-      <div className="shrink-0 w-full sm:w-auto">
+      <div className="flex w-full shrink-0 flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:items-center">
+        <div className="flex items-center gap-3 rounded-2xl border border-orange-500/25 bg-gradient-to-br from-orange-500/15 via-amber-500/10 to-transparent px-4 py-3 shadow-[0_8px_24px_rgba(249,115,22,0.12)]">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500 to-amber-400 text-white shadow-lg shadow-orange-500/25">
+            <Flame size={23} strokeWidth={2.5} />
+          </div>
+          <div className="min-w-[105px]">
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-2xl font-black leading-none tracking-tight text-orange-500">
+                {streak}
+              </span>
+              <span className="text-xs font-bold uppercase tracking-wide text-amber-600 dark:text-amber-300">
+                {streak === 1 ? 'day' : 'days'}
+              </span>
+            </div>
+            <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--neu-text-muted)]">
+              Login streak
+            </p>
+          </div>
+        </div>
+
         <NeuButton
           variant="primary"
           size="md"

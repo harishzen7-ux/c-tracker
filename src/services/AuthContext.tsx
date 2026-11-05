@@ -1,8 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User as FirebaseUser } from 'firebase/auth';
-import { authService, UserProfile } from './authService';
-
-type AuthUser = Pick<FirebaseUser, 'uid' | 'displayName' | 'email'>;
+import { authService, AuthUser, UserProfile } from './authService';
 
 interface AuthContextType {
   currentUser: AuthUser | null;
@@ -24,17 +21,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const loadProfile = async (uid: string) => {
     try {
       const p = await authService.getCurrentUserProfile();
-      setProfile(p);
+      setProfile(p?.uid === uid ? p : null);
     } catch {
       setProfile(null);
     }
   };
 
   useEffect(() => {
-    const unsubscribe = authService.onAuthStateChanged(async (user) => {
+    const unsubscribe = authService.onAuthStateChanged((user) => {
       if (user) {
         setCurrentUser(user);
-        await loadProfile(user.uid);
+        window.setTimeout(() => {
+          void loadProfile(user.uid);
+        }, 0);
       } else {
         // Check for local session
         const local = authService.getLocalSession();
@@ -58,24 +57,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (username: string, pass: string) => {
     const prof = await authService.login(username, pass);
-    if (prof.uid.startsWith('local_')) {
-      setCurrentUser({
-        uid: prof.uid,
-        displayName: prof.username,
-        email: `${prof.usernameLower}@ctracker.local`,
-      });
-    }
+    setCurrentUser({
+      uid: prof.uid,
+      displayName: prof.username,
+      email: `${prof.usernameLower}@ctracker.local`,
+    });
     setProfile(prof);
     return prof;
   };
 
   const signup = async (username: string, pass: string) => {
     const prof = await authService.signup(username, pass);
-    if (prof.uid.startsWith('local_')) {
+    const user = await authService.getCurrentUserProfile();
+    if (user) {
       setCurrentUser({
-        uid: prof.uid,
-        displayName: prof.username,
-        email: `${prof.usernameLower}@ctracker.local`,
+        uid: user.uid,
+        displayName: user.username,
+        email: `${user.usernameLower}@ctracker.local`,
       });
     }
     setProfile(prof);

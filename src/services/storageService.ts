@@ -1,8 +1,15 @@
-import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
-import { db, auth, handleFirestoreError, OperationType } from './firebase';
+import { supabase } from './supabase';
 import { UserProgress, TopicId } from '../types';
 
 const STORAGE_KEY = 'c_tracker_user_progress_v1';
+const LOGIN_STREAK_VERSION = 1;
+
+function getLocalDateString(date = new Date()): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
 
 const defaultProgress: UserProgress = {
   completedLessons: {},
@@ -11,9 +18,10 @@ const defaultProgress: UserProgress = {
   solvedProblems: {},
   savedCode: {},
   streak: {
-    count: 3,
-    lastActiveDate: new Date().toISOString().split('T')[0],
+    count: 0,
+    lastActiveDate: '',
   },
+  loginStreakVersion: LOGIN_STREAK_VERSION,
   theme: 'dark',
   timerEnabled: false,
 };
@@ -43,8 +51,7 @@ export const storageService = {
   async initForUser(uid: string | null): Promise<void> {
     currentUid = uid;
 
-    if (!uid || uid.startsWith('local_')) {
-      // Local session / unauthenticated fallback: read from localStorage
+    if (!uid || uid.startsWith('local_') || !supabase) {
       this.loadFromLocalStorage();
       isInitialized = true;
       notifyListeners();
@@ -52,51 +59,31 @@ export const storageService = {
     }
 
     try {
-      // 1. Fetch remote user document in Firestore
-      const userDocRef = doc(db, 'users', uid);
-      const userSnap = await getDoc(userDocRef);
+      const { data, error } = await supabase
+        .from('user_progress')
+        .select('progress')
+        .eq('user_id', uid)
+        .maybeSingle();
+      if (error) throw error;
 
-      let remoteStreak = { count: 1, lastActiveDate: new Date().toISOString().split('T')[0] };
-      if (userSnap.exists()) {
-        const uData = userSnap.data();
-        if (uData.streak) {
-          remoteStreak = {
-            count: uData.streak,
-            lastActiveDate: uData.lastActiveDate || remoteStreak.lastActiveDate,
-          };
-        }
-      }
-
-      // 2. Fetch progress summary doc
-      const progressDocRef = doc(db, 'progress', uid);
-      const progressSnap = await getDoc(progressDocRef);
-
-      if (progressSnap.exists()) {
-        const pData = progressSnap.data();
+      if (data?.progress) {
+        const remoteProgress = data.progress as Partial<UserProgress>;
+        const isLegacyStreak = remoteProgress.loginStreakVersion !== LOGIN_STREAK_VERSION;
         inMemoryProgress = {
           ...defaultProgress,
-          completedLessons: pData.completedLessons || {},
-          bookmarkedMCQs: pData.bookmarkedMCQs || {},
-          mcqBestScores: pData.mcqBestScores || {},
-          solvedProblems: pData.solvedProblems || {},
-          savedCode: pData.savedCode || {},
-          streak: remoteStreak,
-          theme: pData.theme || 'dark',
-          timerEnabled: !!pData.timerEnabled,
+          ...remoteProgress,
+          streak: isLegacyStreak
+            ? { ...defaultProgress.streak }
+            : { ...defaultProgress.streak, ...remoteProgress.streak },
+          loginStreakVersion: LOGIN_STREAK_VERSION,
         };
       } else {
-        // First time user: One-time migration of existing localStorage progress into the new account!
         const local = this.loadFromLocalStorage();
-        inMemoryProgress = {
-          ...local,
-          streak: remoteStreak,
-        };
-
-        // Write migrated progress to Firestore
-        await this.syncToFirestore(inMemoryProgress, true);
+        inMemoryProgress = local;
+        await this.syncToSupabase(inMemoryProgress, true);
       }
     } catch (err) {
-      console.warn('Failed to load remote progress from Firestore, falling back to local cache:', err);
+      console.error('Failed to load progress from Supabase; using local cache:', err);
       this.loadFromLocalStorage();
     }
 
@@ -108,8 +95,16 @@ export const storageService = {
     try {
       const data = localStorage.getItem(STORAGE_KEY);
       if (data) {
-        const parsed = JSON.parse(data);
-        inMemoryProgress = { ...defaultProgress, ...parsed };
+        const parsed = JSON.parse(data) as Partial<UserProgress>;
+        const isLegacyStreak = parsed.loginStreakVersion !== LOGIN_STREAK_VERSION;
+        inMemoryProgress = {
+          ...defaultProgress,
+          ...parsed,
+          streak: isLegacyStreak
+            ? { ...defaultProgress.streak }
+            : { ...defaultProgress.streak, ...parsed.streak },
+          loginStreakVersion: LOGIN_STREAK_VERSION,
+        };
       } else {
         inMemoryProgress = { ...defaultProgress };
       }
@@ -119,8 +114,8 @@ export const storageService = {
     return inMemoryProgress;
   },
 
-  // Sync state to Firestore (debounced or immediate)
-  async syncToFirestore(progress: UserProgress, immediate = false): Promise<void> {
+  // Sync state to Supabase (debounced or immediate)
+  async syncToSupabase(progress: UserProgress, immediate = false): Promise<void> {
     // Always mirror to localStorage for offline access
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
@@ -128,37 +123,33 @@ export const storageService = {
       // safe
     }
 
-    const uid = currentUid || auth.currentUser?.uid;
-    if (!uid || uid.startsWith('local_')) return;
+    const uid = currentUid;
+    const client = supabase;
+    if (!uid || uid.startsWith('local_') || !client) return;
 
     const doWrite = async () => {
       try {
-        const progressDocRef = doc(db, 'progress', uid);
-        await setDoc(
-          progressDocRef,
+        const { error } = await client.from('user_progress').upsert(
           {
-            completedLessons: progress.completedLessons,
-            bookmarkedMCQs: progress.bookmarkedMCQs,
-            mcqBestScores: progress.mcqBestScores,
-            solvedProblems: progress.solvedProblems,
-            savedCode: progress.savedCode,
-            theme: progress.theme,
-            timerEnabled: progress.timerEnabled,
-            updatedAt: new Date().toISOString(),
+            user_id: uid,
+            progress: {
+              completedLessons: progress.completedLessons,
+              bookmarkedMCQs: progress.bookmarkedMCQs,
+              mcqBestScores: progress.mcqBestScores,
+              solvedProblems: progress.solvedProblems,
+              savedCode: progress.savedCode,
+              theme: progress.theme,
+              timerEnabled: progress.timerEnabled,
+              streak: progress.streak,
+              loginStreakVersion: progress.loginStreakVersion,
+            },
+            updated_at: new Date().toISOString(),
           },
-          { merge: true }
+          { onConflict: 'user_id' }
         );
-
-        // Also update streak on user doc
-        const userDocRef = doc(db, 'users', uid);
-        await updateDoc(userDocRef, {
-          streak: progress.streak.count,
-          lastActiveDate: progress.streak.lastActiveDate,
-        }).catch(() => {
-          // ignore if user doc not ready
-        });
+        if (error) throw error;
       } catch (error) {
-        console.error('Failed writing progress to Firestore:', error);
+        console.error('Failed writing progress to Supabase:', error);
       }
     };
 
@@ -180,7 +171,7 @@ export const storageService = {
 
   saveProgress(progress: UserProgress): void {
     inMemoryProgress = progress;
-    this.syncToFirestore(progress, false);
+    this.syncToSupabase(progress, false);
     notifyListeners();
   },
 
@@ -194,10 +185,9 @@ export const storageService = {
     const key = `${topicId}:${sectionId}`;
     const newState = !progress.completedLessons[key];
     progress.completedLessons[key] = newState;
-    this.updateStreakInternal(progress);
     // Immediate save for lesson completion
     inMemoryProgress = progress;
-    this.syncToFirestore(progress, true);
+    this.syncToSupabase(progress, true);
     notifyListeners();
     return newState;
   },
@@ -212,7 +202,7 @@ export const storageService = {
     const current = !progress.bookmarkedMCQs[mcqId];
     progress.bookmarkedMCQs[mcqId] = current;
     inMemoryProgress = progress;
-    this.syncToFirestore(progress, true);
+    this.syncToSupabase(progress, true);
     notifyListeners();
     return current;
   },
@@ -242,10 +232,9 @@ export const storageService = {
         difficultyBreakdown,
       };
     }
-    this.updateStreakInternal(progress);
     // Immediate save for MCQ attempt/score
     inMemoryProgress = progress;
-    this.syncToFirestore(progress, true);
+    this.syncToSupabase(progress, true);
     notifyListeners();
   },
 
@@ -259,7 +248,7 @@ export const storageService = {
     progress.savedCode[questionId] = code;
     inMemoryProgress = progress;
     // Debounced auto-save code
-    this.syncToFirestore(progress, false);
+    this.syncToSupabase(progress, false);
     notifyListeners();
   },
 
@@ -271,10 +260,9 @@ export const storageService = {
   markProblemSolved(questionId: string): void {
     const progress = this.getProgress();
     progress.solvedProblems[questionId] = true;
-    this.updateStreakInternal(progress);
     // Immediate save on solved
     inMemoryProgress = progress;
-    this.syncToFirestore(progress, true);
+    this.syncToSupabase(progress, true);
     notifyListeners();
   },
 
@@ -283,24 +271,30 @@ export const storageService = {
     return progress.streak.count;
   },
 
-  updateStreakInternal(progress: UserProgress): void {
-    const today = new Date().toISOString().split('T')[0];
-    if (progress.streak.lastActiveDate !== today) {
-      const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-      if (progress.streak.lastActiveDate === yesterday) {
-        progress.streak.count += 1;
-      } else {
-        progress.streak.count = 1;
-      }
-      progress.streak.lastActiveDate = today;
-    }
+  recordLogin(): void {
+    const progress = this.getProgress();
+    const today = getLocalDateString();
+    if (progress.streak.lastActiveDate === today) return;
+
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    progress.streak = {
+      count: progress.streak.lastActiveDate === getLocalDateString(yesterday)
+        ? progress.streak.count + 1
+        : 1,
+      lastActiveDate: today,
+    };
+    progress.loginStreakVersion = LOGIN_STREAK_VERSION;
+    inMemoryProgress = progress;
+    void this.syncToSupabase(progress, true);
+    notifyListeners();
   },
 
   setTheme(theme: 'dark' | 'light'): void {
     const progress = this.getProgress();
     progress.theme = theme;
     inMemoryProgress = progress;
-    this.syncToFirestore(progress, true);
+    this.syncToSupabase(progress, true);
     if (theme === 'light') {
       document.documentElement.classList.add('light');
       document.documentElement.classList.remove('dark');
@@ -319,7 +313,7 @@ export const storageService = {
     const progress = this.getProgress();
     progress.timerEnabled = !progress.timerEnabled;
     inMemoryProgress = progress;
-    this.syncToFirestore(progress, true);
+    this.syncToSupabase(progress, true);
     notifyListeners();
     return progress.timerEnabled;
   },

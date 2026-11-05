@@ -18,92 +18,25 @@ A modern, production-grade web application built with React, TypeScript, and a d
   - `/dashboard` — Master dashboard with 70% circular progress ring, equalizer breakdown, and topic cards.
   - `/topic/:topicId` — Topic arena featuring Learning Arena, MCQ Check, and Try with Code.
 - **Database & Cloud Persistence**:
-  - Full Firebase Firestore + Firebase Authentication integration.
-  - Internal mapping: username mapped to private `<username>@ctracker.local` with zero exposure of email to the user.
-  - One-time automated migration of previous browser progress to newly registered cloud accounts.
+  - Supabase Authentication and Postgres persistence with row-level security.
+  - Username-based sign-in uses a private `<username>@ctracker.local` address internally.
+  - Existing browser progress is copied to the cloud the first time a user signs in.
+  - Without Supabase environment variables, accounts and progress stay in the current browser.
 
 ---
 
-## Firebase Setup & Environment Variables
+## Supabase Setup & Environment Variables
 
-### 1. Configuration
-Firebase is provisioned via AI Studio into `firebase-applet-config.json` with Firestore Enterprise edition:
-
-```json
-{
-  "projectId": "YOUR_PROJECT_ID",
-  "appId": "YOUR_APP_ID",
-  "apiKey": "YOUR_API_KEY",
-  "authDomain": "YOUR_AUTH_DOMAIN",
-  "firestoreDatabaseId": "YOUR_DATABASE_ID",
-  "storageBucket": "YOUR_STORAGE_BUCKET"
-}
-```
-
-Optional environment variables in `.env`:
+1. Create a Supabase project and run [`supabase/schema.sql`](./supabase/schema.sql) in its SQL Editor.
+2. In **Authentication → Providers → Email**, disable email confirmations. This app uses username-only accounts with an internal, non-deliverable email address.
+3. Copy the project URL and anon/public key from the Supabase project API settings into `.env`:
 ```env
+VITE_SUPABASE_URL=https://YOUR_PROJECT_ID.supabase.co
+VITE_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+
 # Optional remote Judge0 API runner endpoint for C code execution
 VITE_JUDGE0_URL=https://judge0-ce.p.rapidapi.com
 VITE_JUDGE0_KEY=YOUR_OPTIONAL_KEY
-```
-
----
-
-## Firestore Database Structure & Security Rules
-
-### Collections
-1. **`/users/{userId}`**:
-   - `username`, `usernameLower`, `createdAt`, `lastLoginAt`, `streak`, `lastActiveDate`, `lastVisited`
-   - Read: Authenticated users.
-   - Write: Only the owner (`request.auth.uid == userId`).
-2. **`/usernames/{usernameLower}`**:
-   - Unique username claims (`uid`, `createdAt`).
-   - Read: Public for availability checking during signup.
-   - Create: Only authenticated user creating their own claim with validation.
-   - Update / Delete: Prohibited (immutable).
-3. **`/progress/{userId}/topics/{topicId}`**:
-   - Subcollections storing lesson completions, MCQ attempts, and solved challenge IDs.
-   - Strict ABAC: Read & write exclusively restricted to the authenticated document owner.
-4. **`/progress/{userId}/code/{questionId}`**:
-   - Stores saved C code drafts and execution history per question.
-   - Read & write exclusively restricted to the owner.
-
-### Deployed Security Rules (`firestore.rules`)
-```javascript
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if false;
-    }
-
-    function isSignedIn() {
-      return request.auth != null;
-    }
-
-    function isOwner(userId) {
-      return isSignedIn() && request.auth.uid == userId;
-    }
-
-    match /users/{userId} {
-      allow get: if isSignedIn();
-      allow list: if isSignedIn() && resource.data.uid == request.auth.uid;
-      allow create, update: if isOwner(userId);
-    }
-
-    match /usernames/{usernameLower} {
-      allow get: if true;
-      allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
-    }
-
-    match /progress/{userId} {
-      allow read, write: if isOwner(userId);
-      match /{allSubcollections=**} {
-        allow read, write: if isOwner(userId);
-      }
-    }
-  }
-}
 ```
 
 ---

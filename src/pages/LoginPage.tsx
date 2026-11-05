@@ -84,10 +84,7 @@ export const LoginPage: React.FC = () => {
       <div className="w-full max-w-md flex flex-col gap-6">
         {/* Brand Header */}
         <div className="flex flex-col items-center text-center gap-2">
-          <Link to="/" className="flex items-center gap-2.5 text-2xl font-black text-[var(--neu-text-primary)]">
-            <div className="w-10 h-10 rounded-xl neu-raised flex items-center justify-center font-mono font-bold text-lg text-[var(--neu-accent)]">
-              C
-            </div>
+          <Link to="/" className="text-2xl font-black text-[var(--neu-text-primary)]">
             <span>
               C <span className="text-[var(--neu-accent)]">Tracker</span>
             </span>

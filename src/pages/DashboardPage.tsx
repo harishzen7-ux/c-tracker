@@ -9,15 +9,32 @@ import { NeuCard } from '../components/common/NeuCard';
 import { NeuRing } from '../components/common/NeuRing';
 import { NeuEqualizer, EqualizerItem } from '../components/common/NeuEqualizer';
 import { NeuButton } from '../components/common/NeuButton';
+import { useAuth } from '../services/AuthContext';
 
 export const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
+  const { currentUser, profile } = useAuth();
   const [progress, setProgress] = useState(storageService.getProgress());
   const topics = getAllTopics();
+  const userName = profile?.username || currentUser?.displayName || 'Learner';
 
-  // Reload progress on focus/mount
+  // Keep the dashboard in sync with progress loaded or updated after mount.
   useEffect(() => {
-    setProgress(storageService.getProgress());
+    const refreshProgress = () => {
+      const currentProgress = storageService.getProgress();
+      setProgress({
+        ...currentProgress,
+        streak: { ...currentProgress.streak },
+      });
+    };
+    const unsubscribe = storageService.subscribe(refreshProgress);
+    window.addEventListener('focus', refreshProgress);
+    refreshProgress();
+
+    return () => {
+      unsubscribe();
+      window.removeEventListener('focus', refreshProgress);
+    };
   }, []);
 
   // Compute stats per topic
@@ -98,6 +115,7 @@ export const DashboardPage: React.FC = () => {
     <div className="flex flex-col gap-10 max-w-7xl mx-auto py-6 px-4 sm:px-6">
       {/* User Profile Summary Card */}
       <UserProfileCard
+        userName={userName}
         totalSolved={totalSolved}
         totalMastered={totalMastered}
         streak={progress.streak.count}
