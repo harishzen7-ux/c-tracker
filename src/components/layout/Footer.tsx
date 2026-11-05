@@ -1,3 +1,5 @@
+import { ContactCredit } from './ContactCredit';
+
 export const Footer: React.FC = () => {
   return (
     <footer className="w-full mt-20 border-t border-[var(--neu-border)] py-8 px-6 text-center text-xs text-[var(--neu-text-muted)]">
@@ -13,6 +15,9 @@ export const Footer: React.FC = () => {
           <span aria-hidden="true">·</span>
           <span>Zero-Latency C Simulator</span>
         </div>
+      </div>
+      <div className="mt-5">
+        <ContactCredit />
       </div>
     </footer>
   );

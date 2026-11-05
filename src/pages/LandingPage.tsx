@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { NeuButton } from '../components/common/NeuButton';
 import { NeuCard } from '../components/common/NeuCard';
 import { ThemeSelector } from '../components/common/ThemeSelector';
+import { ContactCredit } from '../components/layout/ContactCredit';
 import { useAuth } from '../services/AuthContext';
 
 interface LandingPageProps {
@@ -182,24 +183,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ theme, onThemeChange }
         </div>
       </main>
 
-      {/* Learning feature labels */}
-      <section className="flex justify-center border-t border-[var(--neu-border)] py-5 lg:py-6">
-        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-xs font-mono font-semibold sm:gap-x-10 sm:text-sm">
-          <span className="text-[var(--neu-accent)]">
-            Learn
-          </span>
-          <span className="text-[var(--neu-accent)]">
-            MCQ Check
-          </span>
-          <span className="text-[var(--neu-accent)]">
-            Try with Code
-          </span>
-        </div>
-      </section>
-
-      {/* Tiny Footer Line */}
-      <footer className="text-center pt-3 pb-1 text-[11px] font-mono text-[var(--neu-text-muted)]">
-        C Tracker · Skill Mastery Platform
+      <footer className="mt-2 border-t border-[var(--neu-border)] py-5">
+        <ContactCredit />
       </footer>
     </div>
   );

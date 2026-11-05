@@ -4,6 +4,7 @@ import { NeuCard } from '../components/common/NeuCard';
 import { NeuButton } from '../components/common/NeuButton';
 import { authService } from '../services/authService';
 import { useAuth } from '../services/AuthContext';
+import { ContactCredit } from '../components/layout/ContactCredit';
 
 export const LoginPage: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -80,8 +81,8 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-140px)] flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md flex flex-col gap-6">
+    <div className="flex min-h-screen flex-col items-center px-4 py-8">
+      <div className="my-auto w-full max-w-md flex flex-col gap-6">
         {/* Brand Header */}
         <div className="flex flex-col items-center text-center gap-2">
           <Link to="/" className="text-2xl font-black text-[var(--neu-text-primary)]">
@@ -180,6 +181,7 @@ export const LoginPage: React.FC = () => {
           </div>
         </NeuCard>
       </div>
+      <ContactCredit />
     </div>
   );
 };
