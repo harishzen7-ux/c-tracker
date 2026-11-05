@@ -46,8 +46,8 @@ export const inputOutputLessons: Lesson = {
   ],
   examples: [
     {
-      title: 'Example 1 — Very Easy',
-      difficulty: 'Very Easy',
+      title: 'Example 1 — Easy',
+      difficulty: 'Easy',
       problem: 'Print a short welcome message.',
       approach: 'Use printf with a string and a newline.',
       code: '#include <stdio.h>\n\nint main(void) {\n    printf("Welcome to C!\\n");\n    return 0;\n}',
@@ -64,8 +64,8 @@ export const inputOutputLessons: Lesson = {
       explanation: 'The address operator lets scanf store 12 in number.',
     },
     {
-      title: 'Example 3 — Moderate',
-      difficulty: 'Moderate',
+      title: 'Example 3 — Semi-moderate',
+      difficulty: 'Semi-moderate',
       problem: 'Read two integers and print their sum.',
       approach: 'Read both values, add them, and print the result.',
       code: '#include <stdio.h>\n\nint main(void) {\n    int first, second;\n    scanf("%d %d", &first, &second);\n    printf("Sum = %d\\n", first + second);\n    return 0;\n}',
@@ -73,8 +73,8 @@ export const inputOutputLessons: Lesson = {
       explanation: 'scanf reads two values in order; printf evaluates the addition before displaying it.',
     },
     {
-      title: 'Example 4 — Intermediate',
-      difficulty: 'Intermediate',
+      title: 'Example 4 — Moderate',
+      difficulty: 'Moderate',
       problem: 'Read a quantity and a unit price, then print a two-decimal total.',
       approach: 'Multiply the values and use %.2f to show two decimal places.',
       code: '#include <stdio.h>\n\nint main(void) {\n    int quantity;\n    float unitPrice;\n    scanf("%d %f", &quantity, &unitPrice);\n    printf("Total = %.2f\\n", quantity * unitPrice);\n    return 0;\n}',

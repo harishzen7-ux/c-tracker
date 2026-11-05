@@ -19,7 +19,7 @@ export interface LessonSection {
 
 export interface LessonExample {
   title: string;
-  difficulty: 'Very Easy' | 'Easy' | 'Moderate' | 'Intermediate';
+  difficulty: 'Easy' | 'Semi-moderate' | 'Moderate';
   problem: string;
   approach: string;
   code: string;

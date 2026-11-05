@@ -46,8 +46,8 @@ export const operatorsLessons: Lesson = {
   ],
   examples: [
     {
-      title: 'Example 1 — Very Easy',
-      difficulty: 'Very Easy',
+      title: 'Example 1 — Easy',
+      difficulty: 'Easy',
       problem: 'Add two values that are already stored in the program.',
       approach: 'Use + inside printf.',
       code: '#include <stdio.h>\n\nint main(void) {\n    int apples = 3;\n    int oranges = 2;\n    printf("%d\\n", apples + oranges);\n    return 0;\n}',
@@ -64,8 +64,8 @@ export const operatorsLessons: Lesson = {
       explanation: 'The comparison is true, so C prints 1.',
     },
     {
-      title: 'Example 3 — Moderate',
-      difficulty: 'Moderate',
+      title: 'Example 3 — Semi-moderate',
+      difficulty: 'Semi-moderate',
       problem: 'Read two quiz scores and print their average with a decimal.',
       approach: 'Add the scores, cast the total to float, and divide by 2.',
       code: '#include <stdio.h>\n\nint main(void) {\n    int firstScore, secondScore;\n    scanf("%d %d", &firstScore, &secondScore);\n    printf("%.1f\\n", (float)(firstScore + secondScore) / 2);\n    return 0;\n}',
@@ -73,8 +73,8 @@ export const operatorsLessons: Lesson = {
       explanation: 'Casting before division prevents integer division from dropping the .5.',
     },
     {
-      title: 'Example 4 — Intermediate',
-      difficulty: 'Intermediate',
+      title: 'Example 4 — Moderate',
+      difficulty: 'Moderate',
       problem: 'Read a price and quantity and calculate the total after a fixed discount.',
       approach: 'Multiply price by quantity, then subtract the discount.',
       code: '#include <stdio.h>\n\nint main(void) {\n    int price, quantity, discount;\n    scanf("%d %d %d", &price, &quantity, &discount);\n    int total = price * quantity - discount;\n    printf("Total = %d\\n", total);\n    return 0;\n}',

@@ -145,10 +145,6 @@ export const CNeumorphicEditor: React.FC<CNeumorphicEditorProps> = ({
         />
       </div>
 
-      {/* Bottom corner language badge */}
-      <div className="absolute bottom-2 right-3 pointer-events-none text-[10px] font-mono text-[var(--neu-text-muted)] opacity-60">
-        C99 · {lines.length} lines
-      </div>
     </div>
   );
 };

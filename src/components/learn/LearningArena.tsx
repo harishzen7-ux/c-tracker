@@ -198,7 +198,7 @@ export const LearningArena: React.FC<LearningArenaProps> = ({
 
               {currentSection.keyPoint && (
                 <div className="flex gap-2 rounded-xl border p-3 text-sm"
-                  style={{ backgroundColor: 'var(--callout-amber-bg)', borderColor: 'var(--callout-amber-border)', color: 'var(--callout-amber-text)' }}>
+                  style={{ backgroundColor: 'color-mix(in srgb, var(--callout-amber-bg) 50%, transparent)', borderColor: 'var(--callout-amber-border)', color: 'var(--callout-amber-text)' }}>
                   <Lightbulb size={17} className="mt-0.5 shrink-0" />
                   <span><strong>Key point:</strong> {currentSection.keyPoint}</span>
                 </div>
@@ -252,7 +252,7 @@ export const LearningArena: React.FC<LearningArenaProps> = ({
           <div className="mt-4 grid gap-4 lg:grid-cols-3">
             {Object.entries(lesson.practice).map(([level, questions]) => (
               <div key={level} className="rounded-xl border border-[var(--neu-border)] p-4">
-                <h3 className="mb-3 font-semibold capitalize">{level === 'beginner' ? '🟢 Beginner' : level === 'easy' ? '🟡 Easy' : '🟠 Intermediate'}</h3>
+                <h3 className="mb-3 font-semibold capitalize">{level === 'beginner' ? '🟢 Easy' : level === 'easy' ? '🟡 Semi-moderate' : '🟠 Moderate'}</h3>
                 <ul className="flex flex-col gap-3">
                   {questions.map((question) => (
                     <li key={question.title} className="text-sm">

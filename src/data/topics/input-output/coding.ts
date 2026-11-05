@@ -11,7 +11,7 @@ export const inputOutputCodingQuestions: CodingQuestion[] = [
     problemStatement: 'Write a C program that prints the exact message "Hello, World!" followed by a newline.',
     inputFormat: 'No input.',
     outputFormat: 'Print "Hello, World!" followed by a newline.',
-    constraints: 'Standard C99 output.',
+    constraints: 'Print the exact message shown in the problem.',
     sampleCases: [
       { input: '', output: 'Hello, World!\n', explanation: 'Direct string printing via printf or puts.' },
     ],

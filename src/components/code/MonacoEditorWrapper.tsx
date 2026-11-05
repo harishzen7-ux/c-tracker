@@ -12,6 +12,31 @@ interface MonacoEditorWrapperProps {
   onModeToggle?: () => void;
 }
 
+const MacEditorFrame: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div
+    className="w-full rounded-xl border p-3 transition-shadow sm:p-4"
+    style={{
+      backgroundColor: 'var(--neu-surface)',
+      borderColor: 'var(--neu-border)',
+      boxShadow: '6px 6px 14px var(--neu-shadow-dark), -4px -4px 10px var(--neu-shadow-light)',
+    }}
+  >
+    <div className="mb-3 flex flex-wrap items-center justify-between gap-3 px-1">
+      <div className="flex items-center gap-2" aria-label="Editor window controls">
+        <span className="h-3 w-3 rounded-full bg-[#ff5f57]" />
+        <span className="h-3 w-3 rounded-full bg-[#ffbd2e]" />
+        <span className="h-3 w-3 rounded-full bg-[#28c941]" />
+      </div>
+      <span className="text-xs font-semibold text-[var(--neu-text-primary)]">solution.c</span>
+      <div className="flex items-center gap-1.5">
+        <span className="rounded bg-[var(--neu-base)] px-2 py-1 text-[10px] font-medium text-[var(--neu-text-secondary)]">C source</span>
+        <span className="rounded bg-[var(--neu-base)] px-2 py-1 text-[10px] font-medium text-[var(--neu-text-secondary)]">Editable</span>
+      </div>
+    </div>
+    {children}
+  </div>
+);
+
 export const MonacoEditorWrapper: React.FC<MonacoEditorWrapperProps> = ({
   value,
   onChange,
@@ -115,64 +140,69 @@ export const MonacoEditorWrapper: React.FC<MonacoEditorWrapperProps> = ({
   // If Monaco errored or user explicitly prefers the native editor
   if (mode === 'native') {
     return (
-      <CNeumorphicEditor
-        value={value}
-        onChange={onChange}
-        fontSize={fontSize}
-        height={height}
-        readOnly={readOnly}
-      />
+      <MacEditorFrame>
+        <CNeumorphicEditor
+          value={value}
+          onChange={onChange}
+          fontSize={fontSize}
+          height={height}
+          readOnly={readOnly}
+        />
+      </MacEditorFrame>
     );
   }
 
   return (
-    <div
-      className="w-full rounded-2xl neu-inset overflow-hidden border border-[var(--neu-border)] transition-colors"
-      style={{
-        backgroundColor: 'var(--code-box-bg)',
-      }}
-    >
-      <Editor
-        height={height}
-        language="c"
-        value={value}
-        onChange={(val) => onChange(val || '')}
-        onMount={(editor, monaco) => {
-          monacoRef.current = monaco;
-          handleEditorDidMount(editor, monaco);
+    <MacEditorFrame>
+      <div
+        className="w-full overflow-hidden rounded-lg border transition-colors"
+        style={{
+          backgroundColor: 'var(--code-box-bg)',
+          borderColor: 'var(--code-box-border)',
         }}
-        theme={isLightMode ? 'cTrackerLight' : 'cTrackerDark'}
-        options={{
-          fontSize,
-          fontFamily: "'Inter', monospace",
-          minimap: { enabled: false },
-          scrollBeyondLastLine: false,
-          automaticLayout: true,
-          readOnly,
-          tabSize: 4,
-          insertSpaces: true,
-          renderLineHighlight: 'all',
-          cursorBlinking: 'smooth',
-          cursorSmoothCaretAnimation: 'on',
-          smoothScrolling: true,
-          bracketPairColorization: { enabled: true },
-          lineNumbersMinChars: 3,
-        }}
-        loading={
-          <div className="flex flex-col items-center justify-center h-full gap-2 p-6 text-xs font-mono text-[var(--neu-text-muted)]">
-            <span>Loading C Editor Environment...</span>
-            {onModeToggle && (
-              <button
-                type="button"
-                onClick={onModeToggle}
-                className="text-[11px] text-[var(--neu-accent)] underline hover:opacity-80 cursor-pointer"
-              >
-                Switch to lightweight editor
-              </button>
-            )}
-          </div>
-        }
-      />
-    </div>
+      >
+        <Editor
+          height={height}
+          language="c"
+          value={value}
+          onChange={(val) => onChange(val || '')}
+          onMount={(editor, monaco) => {
+            monacoRef.current = monaco;
+            handleEditorDidMount(editor, monaco);
+          }}
+          theme={isLightMode ? 'cTrackerLight' : 'cTrackerDark'}
+          options={{
+            fontSize,
+            fontFamily: "'Inter', monospace",
+            minimap: { enabled: false },
+            scrollBeyondLastLine: false,
+            automaticLayout: true,
+            readOnly,
+            tabSize: 4,
+            insertSpaces: true,
+            renderLineHighlight: 'all',
+            cursorBlinking: 'smooth',
+            cursorSmoothCaretAnimation: 'on',
+            smoothScrolling: true,
+            bracketPairColorization: { enabled: true },
+            lineNumbersMinChars: 3,
+          }}
+          loading={
+            <div className="flex flex-col items-center justify-center h-full gap-2 p-6 text-xs font-mono text-[var(--neu-text-muted)]">
+              <span>Loading C Editor Environment...</span>
+              {onModeToggle && (
+                <button
+                  type="button"
+                  onClick={onModeToggle}
+                  className="text-[11px] text-[var(--neu-accent)] underline hover:opacity-80 cursor-pointer"
+                >
+                  Switch to lightweight editor
+                </button>
+              )}
+            </div>
+          }
+        />
+      </div>
+    </MacEditorFrame>
   );
 };

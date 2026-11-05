@@ -46,8 +46,8 @@ export const loopingLessons: Lesson = {
   ],
   examples: [
     {
-      title: 'Example 1 — Very Easy',
-      difficulty: 'Very Easy',
+      title: 'Example 1 — Easy',
+      difficulty: 'Easy',
       problem: 'Print the numbers from 1 through 5.',
       approach: 'Start a counter at 1, continue while it is at most 5, and increase it each time.',
       code: '#include <stdio.h>\n\nint main(void) {\n    for (int number = 1; number <= 5; number++) {\n        printf("%d ", number);\n    }\n    printf("\\n");\n    return 0;\n}',
@@ -64,8 +64,8 @@ export const loopingLessons: Lesson = {
       explanation: 'The loop adds 1, 2, 3, and 4 to sum.',
     },
     {
-      title: 'Example 3 — Moderate',
-      difficulty: 'Moderate',
+      title: 'Example 3 — Semi-moderate',
+      difficulty: 'Semi-moderate',
       problem: 'Print the first five multiples of a number.',
       approach: 'Repeat a counter from 1 to 5 and print number times counter.',
       code: '#include <stdio.h>\n\nint main(void) {\n    int number;\n    scanf("%d", &number);\n    for (int multiplier = 1; multiplier <= 5; multiplier++) {\n        printf("%d\\n", number * multiplier);\n    }\n    return 0;\n}',
@@ -73,8 +73,8 @@ export const loopingLessons: Lesson = {
       explanation: 'Each iteration uses the next multiplier and displays one product.',
     },
     {
-      title: 'Example 4 — Intermediate',
-      difficulty: 'Intermediate',
+      title: 'Example 4 — Moderate',
+      difficulty: 'Moderate',
       problem: 'Read five integers and count how many are positive.',
       approach: 'Use a loop for five inputs and increase a counter when a value is greater than zero.',
       code: '#include <stdio.h>\n\nint main(void) {\n    int value, positiveCount = 0;\n    for (int item = 0; item < 5; item++) {\n        scanf("%d", &value);\n        if (value > 0) {\n            positiveCount++;\n        }\n    }\n    printf("Positive values = %d\\n", positiveCount);\n    return 0;\n}',

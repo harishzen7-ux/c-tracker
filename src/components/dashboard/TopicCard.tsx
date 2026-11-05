@@ -42,7 +42,6 @@ export const TopicCard: React.FC<TopicCardProps> = ({
   return (
     <NeuCard
       hoverable
-      active={status === 'in_progress'}
       onClick={() => navigate(`/topic/${topic.id}`)}
       className="flex flex-col justify-between h-full p-6 group"
     >

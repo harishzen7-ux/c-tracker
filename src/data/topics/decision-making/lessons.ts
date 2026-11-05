@@ -46,8 +46,8 @@ export const decisionLessons: Lesson = {
   ],
   examples: [
     {
-      title: 'Example 1 — Very Easy',
-      difficulty: 'Very Easy',
+      title: 'Example 1 — Easy',
+      difficulty: 'Easy',
       problem: 'Print whether a number is positive or not positive.',
       approach: 'Read one number and compare it with zero using if/else.',
       code: '#include <stdio.h>\n\nint main(void) {\n    int number;\n    scanf("%d", &number);\n    if (number > 0) {\n        printf("Positive\\n");\n    } else {\n        printf("Not positive\\n");\n    }\n    return 0;\n}',
@@ -64,8 +64,8 @@ export const decisionLessons: Lesson = {
       explanation: 'The >= operator includes the boundary value 50.',
     },
     {
-      title: 'Example 3 — Moderate',
-      difficulty: 'Moderate',
+      title: 'Example 3 — Semi-moderate',
+      difficulty: 'Semi-moderate',
       problem: 'Assign a simple grade from a score.',
       approach: 'Check score ranges from highest to lowest with an else-if ladder.',
       code: '#include <stdio.h>\n\nint main(void) {\n    int score;\n    scanf("%d", &score);\n    if (score >= 80) {\n        printf("A\\n");\n    } else if (score >= 60) {\n        printf("B\\n");\n    } else {\n        printf("C\\n");\n    }\n    return 0;\n}',
@@ -73,8 +73,8 @@ export const decisionLessons: Lesson = {
       explanation: 'The first true condition selects the grade, so a score of 68 prints B.',
     },
     {
-      title: 'Example 4 — Intermediate',
-      difficulty: 'Intermediate',
+      title: 'Example 4 — Moderate',
+      difficulty: 'Moderate',
       problem: 'Read a menu number and print the selected action.',
       approach: 'Use switch for the fixed choices and default for all other numbers.',
       code: '#include <stdio.h>\n\nint main(void) {\n    int choice;\n    scanf("%d", &choice);\n    switch (choice) {\n        case 1: printf("Add\\n"); break;\n        case 2: printf("View\\n"); break;\n        case 3: printf("Exit\\n"); break;\n        default: printf("Invalid choice\\n");\n    }\n    return 0;\n}',

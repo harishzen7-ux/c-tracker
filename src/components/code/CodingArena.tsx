@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import {
   Play,
-  Send,
   RotateCcw,
   CheckCircle2,
   XCircle,
   Code,
-  Terminal,
   FileCode,
   Layers,
   ChevronRight,
@@ -58,6 +56,7 @@ export const CodingArena: React.FC<CodingArenaProps> = ({
   // Execution states
   const [isRunningCustom, setIsRunningCustom] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccessCelebration, setShowSuccessCelebration] = useState(false);
   const [customResult, setCustomResult] = useState<ExecutionResult | null>(null);
   const [testCaseResults, setTestCaseResults] = useState<TestCaseResult[] | null>(null);
   const [allPassed, setAllPassed] = useState<boolean | null>(null);
@@ -164,6 +163,7 @@ export const CodingArena: React.FC<CodingArenaProps> = ({
     if (!currentQ) return;
     setIsSubmitting(true);
     setActiveConsoleTab('testcases');
+    setShowSuccessCelebration(false);
 
     const results: TestCaseResult[] = [];
     let everyPassed = true;
@@ -215,14 +215,37 @@ export const CodingArena: React.FC<CodingArenaProps> = ({
       storageService.markProblemSolved(currentQ.id);
       onProblemSolved();
       try {
-        confetti({
-          particleCount: 70,
-          spread: 60,
-          origin: { y: 0.6 },
-          colors: ['#FF7A1A', '#22c55e', '#38bdf8'],
-        });
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (!reducedMotion) {
+          const colors = ['#FF7A1A', '#22c55e', '#38bdf8', '#fbbf24'];
+          confetti({
+            particleCount: 90,
+            spread: 78,
+            startVelocity: 42,
+            origin: { y: 0.62 },
+            colors,
+          });
+          window.setTimeout(() => {
+            confetti({
+              particleCount: 45,
+              spread: 110,
+              startVelocity: 28,
+              origin: { x: 0.15, y: 0.68 },
+              colors,
+            });
+            confetti({
+              particleCount: 45,
+              spread: 110,
+              startVelocity: 28,
+              origin: { x: 0.85, y: 0.68 },
+              colors,
+            });
+          }, 180);
+        }
+        setShowSuccessCelebration(true);
+        window.setTimeout(() => setShowSuccessCelebration(false), 4200);
       } catch (e) {
-        // safe
+        console.warn('Could not display the submission celebration:', e);
       }
     }
 
@@ -241,6 +264,40 @@ export const CodingArena: React.FC<CodingArenaProps> = ({
 
   return (
     <div className="flex flex-col gap-6">
+      <style>{`
+        @keyframes arena-success-enter {
+          0% { opacity: 0; transform: translateY(14px) scale(0.96); }
+          70% { opacity: 1; transform: translateY(-2px) scale(1.01); }
+          100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes arena-success-check {
+          0% { opacity: 0; transform: scale(0.35) rotate(-25deg); }
+          65% { opacity: 1; transform: scale(1.18) rotate(8deg); }
+          100% { opacity: 1; transform: scale(1) rotate(0); }
+        }
+        @keyframes arena-success-spark {
+          0%, 100% { opacity: 0.35; transform: scale(0.7) rotate(0); }
+          50% { opacity: 1; transform: scale(1.2) rotate(25deg); }
+        }
+        .arena-success-celebration {
+          position: relative;
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          overflow: hidden;
+          padding: 18px;
+          border: 1px solid color-mix(in srgb, #22c55e 55%, transparent);
+          border-radius: 16px;
+          background: linear-gradient(110deg, color-mix(in srgb, #22c55e 22%, var(--neu-surface)), var(--neu-surface));
+          box-shadow: 0 8px 26px color-mix(in srgb, #22c55e 22%, transparent), 4px 4px 12px var(--neu-shadow-dark);
+          animation: arena-success-enter 520ms cubic-bezier(.2,.8,.2,1) both;
+        }
+        .arena-success-check { display: grid; place-items: center; color: var(--neu-green); animation: arena-success-check 650ms 100ms cubic-bezier(.2,.8,.2,1) both; }
+        .arena-success-spark { margin-left: auto; color: #fbbf24; font-size: 30px; animation: arena-success-spark 1.2s ease-in-out infinite; }
+        @media (prefers-reduced-motion: reduce) {
+          .arena-success-celebration, .arena-success-check, .arena-success-spark { animation: none; }
+        }
+      `}</style>
       {/* Question Selector Strip */}
       <div className="p-3 rounded-2xl neu-raised overflow-x-auto">
         <div className="flex items-center gap-2 min-w-max">
@@ -264,7 +321,7 @@ export const CodingArena: React.FC<CodingArenaProps> = ({
               >
                 <span>{q.number}.</span>
                 <span className="truncate max-w-[120px]">{q.title}</span>
-                {solved && <CheckCircle2 size={12} className="text-emerald-400 shrink-0" />}
+                {solved && <CheckCircle2 size={12} className="text-emerald-700 dark:text-emerald-400 shrink-0" />}
               </button>
             );
           })}
@@ -277,9 +334,6 @@ export const CodingArena: React.FC<CodingArenaProps> = ({
             {solvedCount} / {questions.length} Solved
           </span>
         </p>
-        <div className="h-2 w-full overflow-hidden rounded-full bg-[var(--neu-base)] sm:w-48">
-          <div className="h-full rounded-full bg-[var(--neu-accent)]" style={{ width: `${questions.length ? (solvedCount / questions.length) * 100 : 0}%` }} />
-        </div>
       </div>
 
       {/* Main Split Layout: Left Problem / Right Monaco Editor */}
@@ -299,11 +353,11 @@ export const CodingArena: React.FC<CodingArenaProps> = ({
               </div>
 
               <div className="flex items-center gap-2 shrink-0">
-                <NeuBadge variant={currentQ.difficulty === 'hard' ? 'medium' : currentQ.difficulty}>
-                  {currentQ.difficulty === 'easy' ? '🟢 Beginner' : currentQ.difficulty === 'medium' ? '🟡 Easy' : '🟠 Intermediate'}
+                <NeuBadge dot={false} variant={currentQ.difficulty === 'hard' ? 'medium' : currentQ.difficulty}>
+                  {currentQ.difficulty === 'easy' ? '🟢 Easy' : currentQ.difficulty === 'medium' ? '🟡 Semi-moderate' : '🟠 Moderate'}
                 </NeuBadge>
                 {isSolved && (
-                  <span className="flex items-center gap-1 text-[11px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/30">
+                  <span className="flex items-center gap-1 text-[11px] font-mono text-emerald-800 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-700/30 dark:border-emerald-500/30">
                     <CheckCircle2 size={12} />
                     <span>Solved</span>
                   </span>
@@ -376,7 +430,7 @@ export const CodingArena: React.FC<CodingArenaProps> = ({
                       </div>
                       <div>
                         <span className="mb-0.5 block text-[10px] font-semibold text-[var(--neu-text-muted)]">Expected output:</span>
-                        <pre className="overflow-x-auto rounded-lg bg-emerald-500/10 p-2">{testCase.expectedOutput || '(empty)'}</pre>
+                        <pre className="overflow-x-auto rounded-lg bg-emerald-100 text-emerald-950 dark:bg-emerald-500/10 dark:text-emerald-300 p-2">{testCase.expectedOutput || '(empty)'}</pre>
                       </div>
                     </div>
                   </button>
@@ -386,24 +440,41 @@ export const CodingArena: React.FC<CodingArenaProps> = ({
 
             {currentQ.hints && (
               <div className="rounded-xl border border-[var(--neu-border)] p-4">
-                <button type="button" onClick={() => setHintLevel((level) => Math.min(level + 1, currentQ.hints!.length))}
+                <button
+                  type="button"
+                  aria-expanded={hintLevel > 0}
+                  aria-controls={`${currentQ.id}-hints`}
+                  onClick={() => setHintLevel((level) => Math.min(level + 1, currentQ.hints!.length))}
                   disabled={hintLevel >= currentQ.hints.length}
                   className="flex items-center gap-2 text-sm font-semibold text-[var(--neu-accent)] disabled:opacity-50">
                   <Lightbulb size={15} />
                   {hintLevel === 0 ? 'Need a Hint?' : hintLevel >= currentQ.hints.length ? 'All hints shown' : `Show Hint ${hintLevel + 1}`}
                 </button>
-                {hintLevel > 0 && <p className="mt-2 text-sm text-[var(--neu-text-secondary)]">{currentQ.hints[hintLevel - 1]}</p>}
+                {hintLevel > 0 && (
+                  <ol id={`${currentQ.id}-hints`} className="mt-3 flex flex-col gap-2">
+                    {currentQ.hints.slice(0, hintLevel).map((hint, index) => (
+                      <li key={hint} className="text-sm text-[var(--neu-text-secondary)]">
+                        <span className="mr-1 font-semibold text-[var(--neu-accent)]">Hint {index + 1}:</span>
+                        {hint}
+                      </li>
+                    ))}
+                  </ol>
+                )}
               </div>
             )}
 
             {currentQ.solution && (
               <div className="rounded-xl border border-[var(--neu-border)] p-4">
-                <button type="button" onClick={() => setSolutionVisible((visible) => !visible)}
+                <button
+                  type="button"
+                  aria-expanded={solutionVisible}
+                  aria-controls={`${currentQ.id}-solution`}
+                  onClick={() => setSolutionVisible((visible) => !visible)}
                   className="text-sm font-semibold text-[var(--neu-accent)]">
                   {solutionVisible ? 'Hide Solution' : 'View Solution'}
                 </button>
                 {solutionVisible && (
-                  <div className="mt-3 flex flex-col gap-3">
+                  <div id={`${currentQ.id}-solution`} className="mt-3 flex flex-col gap-3">
                     <div>
                       <h4 className="text-xs font-semibold uppercase text-[var(--neu-text-muted)]">Approach</h4>
                       <ol className="mt-1 list-inside list-decimal text-sm text-[var(--neu-text-secondary)]">
@@ -430,7 +501,7 @@ export const CodingArena: React.FC<CodingArenaProps> = ({
               <div className="flex items-center gap-2">
                 <FileCode size={16} className="text-[var(--neu-accent)]" />
                 <span className="text-xs font-mono font-bold text-[var(--neu-text-primary)]">
-                  solution.c (C99 Standard)
+                  solution.c
                 </span>
               </div>
 
@@ -515,7 +586,6 @@ export const CodingArena: React.FC<CodingArenaProps> = ({
                   size="sm"
                   onClick={handleRunCustom}
                   disabled={isRunningCustom || isSubmitting}
-                  icon={<Terminal size={14} />}
                 >
                   Run Custom
                 </NeuButton>
@@ -525,7 +595,6 @@ export const CodingArena: React.FC<CodingArenaProps> = ({
                   size="sm"
                   onClick={handleSubmit}
                   disabled={isRunningCustom || isSubmitting}
-                  icon={<Send size={14} />}
                 >
                   {isSubmitting ? 'Evaluating...' : 'Submit Code'}
                 </NeuButton>
@@ -538,7 +607,6 @@ export const CodingArena: React.FC<CodingArenaProps> = ({
             {/* Console Header Tabs */}
             <div className="flex items-center justify-between pb-3 border-b border-[var(--neu-border)]">
               <div className="flex items-center gap-2">
-                <Terminal size={15} className="text-[var(--neu-accent)]" />
                 <span className="text-xs font-mono font-bold text-[var(--neu-text-primary)]">
                   Execution Terminal
                 </span>
@@ -571,11 +639,25 @@ export const CodingArena: React.FC<CodingArenaProps> = ({
             {/* TAB 1: Test Cases Results */}
             {activeConsoleTab === 'testcases' && (
               <div className="flex flex-col gap-3">
+                {showSuccessCelebration && allPassed && (
+                  <div className="arena-success-celebration" role="status" aria-live="polite">
+                    <span className="arena-success-check" aria-hidden="true">
+                      <CheckCircle2 size={30} />
+                    </span>
+                    <div>
+                      <p className="text-base font-bold text-emerald-800 dark:text-emerald-300">Excellent work!</p>
+                      <p className="mt-1 text-sm text-[var(--neu-text-secondary)]">
+                        All tests passed. You solved “{currentQ.title}”.
+                      </p>
+                    </div>
+                    <span className="arena-success-spark" aria-hidden="true">✦</span>
+                  </div>
+                )}
                 {allPassed !== null && (
                   <div
                     className={`p-3.5 rounded-xl flex items-center justify-between ${
                       allPassed
-                        ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-400'
+                        ? 'bg-emerald-100 border border-emerald-700/40 text-emerald-900 dark:bg-emerald-500/15 dark:border-emerald-400/40 dark:text-emerald-300'
                         : 'bg-rose-500/10 border border-rose-500/30 text-rose-400'
                     }`}
                   >
@@ -605,18 +687,18 @@ export const CodingArena: React.FC<CodingArenaProps> = ({
                         key={tc.index}
                         className={`p-3 rounded-xl neu-inset border ${
                           tc.passed
-                            ? 'border-emerald-500/20 bg-emerald-500/5'
+                            ? 'border-emerald-700/40 bg-emerald-100 dark:border-emerald-400/30 dark:bg-emerald-500/10'
                             : 'border-rose-500/20 bg-rose-500/5'
                         }`}
                       >
                         <div className="flex items-center justify-between text-xs font-mono mb-1.5">
                           <span className="flex items-center gap-2 font-semibold">
                             {tc.passed ? (
-                              <CheckCircle2 size={13} className="text-emerald-400" />
+                              <CheckCircle2 size={13} className="text-emerald-700 dark:text-emerald-400" />
                             ) : (
                               <XCircle size={13} className="text-rose-400" />
                             )}
-                            <span className={tc.passed ? 'text-emerald-400' : 'text-rose-400'}>
+                            <span className={tc.passed ? 'text-emerald-800 dark:text-emerald-300' : 'text-rose-400'}>
                               Test Case {tc.index} {tc.isHidden ? '(Hidden)' : '(Visible)'}
                             </span>
                           </span>
@@ -627,7 +709,7 @@ export const CodingArena: React.FC<CodingArenaProps> = ({
                           <div className="grid grid-cols-2 gap-2 text-[11px] font-mono mt-2">
                             <div>
                               <span className="text-[10px] text-[var(--neu-text-muted)] block font-semibold">Expected:</span>
-                              <pre className="p-1.5 rounded bg-black/10 dark:bg-black/40 text-emerald-800 dark:text-emerald-400 font-semibold truncate border border-emerald-500/20 dark:border-transparent">
+                              <pre className="p-1.5 rounded bg-emerald-100 dark:bg-black/40 text-emerald-950 dark:text-emerald-300 font-semibold truncate border border-emerald-700/30 dark:border-transparent">
                                 {tc.expectedOutput}
                               </pre>
                             </div>
@@ -668,7 +750,7 @@ export const CodingArena: React.FC<CodingArenaProps> = ({
                     {selectedTestPassed !== null && (
                       <div className={`rounded-xl border p-3 font-sans text-sm font-semibold ${
                         selectedTestPassed
-                          ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-500'
+                          ? 'border-emerald-700/40 bg-emerald-100 text-emerald-900 dark:border-emerald-400/40 dark:bg-emerald-500/15 dark:text-emerald-300'
                           : 'border-rose-500/30 bg-rose-500/10 text-rose-500'
                       }`}>
                         {selectedTestPassed ? '✓ Test Case Passed' : '✗ Test Case Failed'}
