@@ -1,0 +1,8 @@
+{
+  "name": "Remix C Tracker",
+  "description": "Skill-tracking platform for mastering C programming with interactive lessons, 50 MCQs with compiler output prediction, and 25 coding challenges with embedded Monaco editor.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

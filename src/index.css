@@ -1,0 +1,176 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-mono: 'Inter', monospace;
+}
+
+@layer base {
+  :root {
+    --neu-base: #2a2d32;
+    --neu-surface: #2f3237;
+    --neu-surface-hover: #35393f;
+    --neu-shadow-dark: rgba(0, 0, 0, 0.55);
+    --neu-shadow-light: rgba(255, 255, 255, 0.05);
+    --neu-accent: #FF7A1A;
+    --neu-accent-light: #FF9A45;
+    --neu-accent-glow: rgba(255, 122, 26, 0.45);
+    --neu-text-primary: #E6E8EB;
+    --neu-text-secondary: #9AA0A8;
+    --neu-text-muted: #6f7682;
+    --neu-border: rgba(255, 255, 255, 0.04);
+    --neu-ring-track: rgba(0, 0, 0, 0.45);
+    --neu-green: #22c55e;
+    --neu-green-glow: rgba(34, 197, 94, 0.35);
+    --neu-red: #ef4444;
+    --neu-red-glow: rgba(239, 68, 68, 0.35);
+
+    /* Callout & alert variables */
+    --callout-red-bg: rgba(239, 68, 68, 0.12);
+    --callout-red-border: rgba(239, 68, 68, 0.3);
+    --callout-red-title: #f87171;
+    --callout-red-text: #fca5a5;
+
+    --callout-amber-bg: rgba(245, 158, 11, 0.12);
+    --callout-amber-border: rgba(245, 158, 11, 0.3);
+    --callout-amber-title: #fbbf24;
+    --callout-amber-text: #fde68a;
+
+    --code-box-bg: #1c1f24;
+    --code-box-border: rgba(255, 255, 255, 0.08);
+    --code-box-text: #e2e8f0;
+    --code-box-keyword: #FF9A45;
+    --code-box-string: #22c55e;
+    
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: var(--neu-text-primary);
+    background-color: var(--neu-base);
+  }
+
+  html.light {
+    --neu-base: #e2e6ee;
+    --neu-surface: #e8ecf4;
+    --neu-surface-hover: #eff3fa;
+    --neu-shadow-dark: rgba(160, 175, 195, 0.75);
+    --neu-shadow-light: rgba(255, 255, 255, 0.95);
+    --neu-accent: #d85200; /* Deep high contrast amber-orange on light */
+    --neu-accent-light: #ea580c;
+    --neu-accent-glow: rgba(216, 82, 0, 0.35);
+    --neu-text-primary: #0f141c; /* Deep rich near-black for 14:1 contrast */
+    --neu-text-secondary: #333d4b; /* Crisp dark slate for 8:1 contrast */
+    --neu-text-muted: #4e5969; /* Legible muted dark slate */
+    --neu-border: rgba(0, 0, 0, 0.1);
+    --neu-ring-track: rgba(0, 0, 0, 0.1);
+    --neu-green: #15803d;
+    --neu-green-glow: rgba(21, 128, 61, 0.25);
+    --neu-red: #b91c1c;
+    --neu-red-glow: rgba(185, 28, 28, 0.25);
+
+    /* High contrast light callouts */
+    --callout-red-bg: #fee2e2;
+    --callout-red-border: #fca5a5;
+    --callout-red-title: #991b1b;
+    --callout-red-text: #7f1d1d;
+
+    --callout-amber-bg: #fef3c7;
+    --callout-amber-border: #fcd34d;
+    --callout-amber-title: #92400e;
+    --callout-amber-text: #78350f;
+
+    /* Light mode code containers: clean crisp soft white-gray inset box with dark syntax */
+    --code-box-bg: #f5f7fa;
+    --code-box-border: rgba(0, 0, 0, 0.12);
+    --code-box-text: #0f172a;
+    --code-box-keyword: #c2410c;
+    --code-box-string: #15803d;
+    
+    color: var(--neu-text-primary);
+    background-color: var(--neu-base);
+  }
+
+  body {
+    min-height: 100vh;
+    background-color: var(--neu-base);
+    color: var(--neu-text-primary);
+    overflow-x: hidden;
+  }
+
+  code, pre, .font-mono {
+    font-family: 'Inter', monospace;
+  }
+}
+
+/* Custom Neumorphic utility classes */
+.neu-raised {
+  background-color: var(--neu-surface);
+  box-shadow: 6px 6px 14px var(--neu-shadow-dark), -5px -5px 12px var(--neu-shadow-light);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.neu-raised-sm {
+  background-color: var(--neu-surface);
+  box-shadow: 3px 3px 8px var(--neu-shadow-dark), -3px -3px 7px var(--neu-shadow-light);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.neu-raised-lg {
+  background-color: var(--neu-surface);
+  box-shadow: 10px 10px 24px var(--neu-shadow-dark), -8px -8px 20px var(--neu-shadow-light);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.neu-raised-hover:hover {
+  box-shadow: 8px 8px 18px var(--neu-shadow-dark), -6px -6px 15px var(--neu-shadow-light);
+  transform: translateY(-1px);
+}
+
+.neu-inset {
+  background-color: var(--neu-base);
+  box-shadow: inset 4px 4px 8px var(--neu-shadow-dark), inset -4px -4px 8px var(--neu-shadow-light);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.neu-inset-sm {
+  background-color: var(--neu-base);
+  box-shadow: inset 2px 2px 5px var(--neu-shadow-dark), inset -2px -2px 5px var(--neu-shadow-light);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.neu-glow-orange {
+  box-shadow: 0 0 14px var(--neu-accent-glow);
+}
+
+.neu-glow-green {
+  box-shadow: 0 0 14px var(--neu-green-glow);
+}
+
+.neu-glow-red {
+  box-shadow: 0 0 14px var(--neu-red-glow);
+}
+
+.neu-orange-gradient {
+  background: linear-gradient(135deg, #FF7A1A 0%, #FF9A45 100%);
+}
+
+html.light .neu-orange-gradient {
+  background: linear-gradient(135deg, #e65c00 0%, #FF7A1A 100%);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--neu-base);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--neu-surface-hover);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--neu-accent);
+}
