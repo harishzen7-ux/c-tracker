@@ -71,19 +71,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ theme, onThemeChange }
           </p>
 
           <div className="flex w-full flex-col items-center gap-4 pt-3 lg:items-start">
-            <Link
-              to="/getting-started"
-              className="group relative inline-flex min-h-[62px] min-w-[250px] items-center justify-center rounded-full px-9 text-base font-extrabold tracking-tight shadow-[0_10px_30px_var(--neu-accent-glow)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_38px_var(--neu-accent-glow)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--neu-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--neu-base)]"
-            >
-              <span className="pointer-events-none absolute -inset-1 rounded-full bg-[var(--neu-accent)]/15 blur-md transition-opacity group-hover:opacity-90" />
-              <span className="begin-cta absolute inset-0 rounded-full" aria-hidden="true" />
-              <span className="relative">
-                Where you begin
-              </span>
-            </Link>
-            <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--neu-accent)]">
-              New to C? Start here
-            </span>
             {currentUser ? (
               <Link to="/dashboard">
                 <NeuButton

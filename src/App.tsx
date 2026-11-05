@@ -56,12 +56,16 @@ function MainApp() {
           element={<LandingPage theme={theme} onThemeChange={handleThemeChange} />}
         />
 
-        {/* PUBLIC ROUTE 2 & 3: Auth pages */}
+        {/* PUBLIC ROUTES: Auth pages */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route
           path="/getting-started"
-          element={<WhereYouBeginPage theme={theme} onThemeChange={handleThemeChange} />}
+          element={
+            <ProtectedRoute>
+              <WhereYouBeginPage theme={theme} onThemeChange={handleThemeChange} />
+            </ProtectedRoute>
+          }
         />
 
         {/* PROTECTED ROUTES: Dashboard & Topics */}
