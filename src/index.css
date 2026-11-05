@@ -152,8 +152,36 @@
   background: linear-gradient(135deg, #FF7A1A 0%, #FF9A45 100%);
 }
 
+.begin-cta {
+  isolation: isolate;
+  overflow: hidden;
+  background: linear-gradient(115deg, var(--neu-accent), var(--neu-accent-light), var(--neu-accent));
+  color: #17191c;
+}
+
+.begin-cta::after {
+  position: absolute;
+  inset: 0;
+  width: 45%;
+  content: '';
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+  transform: translateX(-220%) skewX(-18deg);
+  transition: transform 650ms ease;
+}
+
+.group:hover .begin-cta::after,
+.group:focus-visible .begin-cta::after {
+  transform: translateX(360%) skewX(-18deg);
+}
+
 html.light .neu-orange-gradient {
   background: linear-gradient(135deg, #e65c00 0%, #FF7A1A 100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .begin-cta::after {
+    transition: none;
+  }
 }
 
 /* Custom Scrollbar */

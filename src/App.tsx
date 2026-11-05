@@ -7,6 +7,7 @@ import { TopicPage } from './pages/TopicPage';
 import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './pages/LoginPage';
 import { SignupPage } from './pages/SignupPage';
+import { WhereYouBeginPage } from './pages/WhereYouBeginPage';
 import { storageService } from './services/storageService';
 import { AuthProvider, useAuth } from './services/AuthContext';
 import { ProtectedRoute } from './services/ProtectedRoute';
@@ -18,10 +19,17 @@ function MainApp() {
   // Initialize storage for current authenticated user
   useEffect(() => {
     const uid = currentUser?.uid || null;
-    storageService.initForUser(uid).then(() => {
+    let active = true;
+    void storageService.initForUser(uid).then(() => {
+      if (!active) return;
+      setTheme(storageService.getTheme());
       if (uid) storageService.recordLogin();
     });
-  }, [currentUser]);
+
+    return () => {
+      active = false;
+    };
+  }, [currentUser?.uid]);
 
   useEffect(() => {
     if (theme === 'light') {
@@ -51,6 +59,10 @@ function MainApp() {
         {/* PUBLIC ROUTE 2 & 3: Auth pages */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
+        <Route
+          path="/getting-started"
+          element={<WhereYouBeginPage theme={theme} onThemeChange={handleThemeChange} />}
+        />
 
         {/* PROTECTED ROUTES: Dashboard & Topics */}
         <Route

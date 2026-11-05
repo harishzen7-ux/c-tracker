@@ -4,7 +4,6 @@ import {
   RotateCcw,
   CheckCircle2,
   XCircle,
-  Code,
   FileCode,
   Layers,
   ChevronRight,
@@ -51,7 +50,6 @@ export const CodingArena: React.FC<CodingArenaProps> = ({
   const [code, setCode] = useState<string>('');
   const [customInput, setCustomInput] = useState<string>('');
   const [fontSize, setFontSize] = useState<number>(14);
-  const [editorMode, setEditorMode] = useState<'monaco' | 'native'>('monaco');
 
   // Execution states
   const [isRunningCustom, setIsRunningCustom] = useState(false);
@@ -430,7 +428,7 @@ export const CodingArena: React.FC<CodingArenaProps> = ({
                       </div>
                       <div>
                         <span className="mb-0.5 block text-[10px] font-semibold text-[var(--neu-text-muted)]">Expected output:</span>
-                        <pre className="overflow-x-auto rounded-lg bg-emerald-100 text-emerald-950 dark:bg-emerald-500/10 dark:text-emerald-300 p-2">{testCase.expectedOutput || '(empty)'}</pre>
+                        <pre className="overflow-x-auto rounded-lg bg-green-100 text-green-950 dark:bg-green-500/10 dark:text-green-300 p-2">{testCase.expectedOutput || '(empty)'}</pre>
                       </div>
                     </div>
                   </button>
@@ -506,17 +504,6 @@ export const CodingArena: React.FC<CodingArenaProps> = ({
               </div>
 
               <div className="flex items-center gap-3">
-                {/* Mode toggle button */}
-                <button
-                  type="button"
-                  onClick={() => setEditorMode((prev) => (prev === 'monaco' ? 'native' : 'monaco'))}
-                  className="px-2.5 py-1 rounded-lg neu-inset text-[11px] font-mono text-[var(--neu-text-secondary)] hover:text-[var(--neu-accent)] transition-all cursor-pointer flex items-center gap-1.5"
-                  title="Switch between Monaco and lightweight C editor"
-                >
-                  <Code size={12} className="text-[var(--neu-accent)]" />
-                  <span>{editorMode === 'monaco' ? 'Monaco Engine' : 'Fast C Editor'}</span>
-                </button>
-
                 {/* Font Size slider */}
                 <div className="w-24 hidden sm:block">
                   <NeuSlider
@@ -540,14 +527,12 @@ export const CodingArena: React.FC<CodingArenaProps> = ({
               </div>
             </div>
 
-            {/* Monaco / Native Editor */}
+            {/* Monaco Editor */}
             <MonacoEditorWrapper
               value={code}
               onChange={handleCodeChange}
               fontSize={fontSize}
               height="360px"
-              mode={editorMode}
-              onModeToggle={() => setEditorMode((prev) => (prev === 'monaco' ? 'native' : 'monaco'))}
             />
 
             {/* Custom Input Box (stdin) */}

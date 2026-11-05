@@ -44,19 +44,84 @@ export const codeRunnerService = {
   },
 
   validateSyntax(code: string): string | null {
-    if (!code.includes('main')) {
+    const syntaxCode = code.split('');
+    const mask = (start: number, end: number) => {
+      for (let index = start; index < Math.min(end, syntaxCode.length); index++) {
+        if (syntaxCode[index] !== '\n' && syntaxCode[index] !== '\r') {
+          syntaxCode[index] = ' ';
+        }
+      }
+    };
+
+    for (let index = 0; index < code.length; index++) {
+      const current = code[index];
+      const next = code[index + 1];
+
+      if (current === '/' && next === '/') {
+        const start = index;
+        while (index < code.length && code[index] !== '\n') index++;
+        mask(start, index);
+        index--;
+        continue;
+      }
+
+      if (current === '/' && next === '*') {
+        const start = index;
+        index += 2;
+        while (index < code.length && !(code[index] === '*' && code[index + 1] === '/')) {
+          index++;
+        }
+        if (index < code.length) index += 2;
+        mask(start, index);
+        index--;
+        continue;
+      }
+
+      if (current === '"' || current === "'") {
+        const start = index;
+        const quote = current;
+        index++;
+        while (index < code.length) {
+          if (code[index] === '\\') {
+            index += 2;
+          } else if (code[index] === quote) {
+            index++;
+            break;
+          } else {
+            index++;
+          }
+        }
+        mask(start, index);
+        index--;
+      }
+    }
+
+    const maskedCode = syntaxCode.join('');
+    if (!/\bmain\s*\(/.test(maskedCode)) {
       return "error: undefined reference to 'main'\ncollect2: error: ld returned 1 exit status";
     }
-    const openBraces = (code.match(/{/g) || []).length;
-    const closeBraces = (code.match(/}/g) || []).length;
-    if (openBraces !== closeBraces) {
-      return `error: expected '}' at end of input. Found ${openBraces} opening and ${closeBraces} closing braces.`;
+
+    const openingDelimiters: Array<{ value: string; index: number }> = [];
+    const closingToOpening: Record<string, string> = { ')': '(', ']': '[', '}': '{' };
+    const openingToClosing: Record<string, string> = { '(': ')', '[': ']', '{': '}' };
+
+    for (let index = 0; index < maskedCode.length; index++) {
+      const delimiter = maskedCode[index];
+      if (openingToClosing[delimiter]) {
+        openingDelimiters.push({ value: delimiter, index });
+      } else if (closingToOpening[delimiter]) {
+        const opening = openingDelimiters.pop();
+        if (!opening || opening.value !== closingToOpening[delimiter]) {
+          return `error: unexpected '${delimiter}' in source code.`;
+        }
+      }
     }
-    const openParens = (code.match(/\(/g) || []).length;
-    const closeParens = (code.match(/\)/g) || []).length;
-    if (openParens !== closeParens) {
-      return `error: mismatched parentheses '(' and ')'.`;
+
+    const unclosedDelimiter = openingDelimiters[openingDelimiters.length - 1];
+    if (unclosedDelimiter) {
+      return `error: expected '${openingToClosing[unclosedDelimiter.value]}' at end of input.`;
     }
+
     return null;
   },
 

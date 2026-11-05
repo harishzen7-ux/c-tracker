@@ -28,15 +28,85 @@ const defaultProgress: UserProgress = {
   timerEnabled: false,
 };
 
+function createDefaultProgress(): UserProgress {
+  return {
+    ...defaultProgress,
+    completedLessons: {},
+    bookmarkedMCQs: {},
+    mcqBestScores: {},
+    solvedProblems: {},
+    savedCode: {},
+    streak: { ...defaultProgress.streak },
+  };
+}
+
 // In-memory cache of user progress to ensure synchronous instant UI response for existing components
-let inMemoryProgress: UserProgress = defaultProgress;
+let inMemoryProgress: UserProgress = createDefaultProgress();
 let isInitialized = false;
 let currentUid: string | null = null;
-let saveDebounceTimer: any = null;
+let cloudReadyUid: string | null = null;
+let initializationId = 0;
+let saveDebounceTimer: ReturnType<typeof setTimeout> | null = null;
 
 // Listeners for progress changes (to update UI if needed)
 type Listener = () => void;
 const listeners = new Set<Listener>();
+
+function progressStorageKey(uid: string | null): string {
+  return uid ? `${STORAGE_KEY}:${uid}` : STORAGE_KEY;
+}
+
+function normalizeProgress(parsed: Partial<UserProgress>): UserProgress {
+  const isLegacyStreak = parsed.loginStreakVersion !== LOGIN_STREAK_VERSION;
+  const hasSavedThemePreference = parsed.themePreferenceVersion === THEME_PREFERENCE_VERSION;
+  return {
+    ...createDefaultProgress(),
+    ...parsed,
+    completedLessons: { ...parsed.completedLessons },
+    bookmarkedMCQs: { ...parsed.bookmarkedMCQs },
+    mcqBestScores: { ...parsed.mcqBestScores },
+    solvedProblems: { ...parsed.solvedProblems },
+    savedCode: { ...parsed.savedCode },
+    theme: hasSavedThemePreference ? parsed.theme ?? defaultProgress.theme : 'light',
+    streak: isLegacyStreak
+      ? createDefaultProgress().streak
+      : { ...defaultProgress.streak, ...parsed.streak },
+    loginStreakVersion: LOGIN_STREAK_VERSION,
+    themePreferenceVersion: THEME_PREFERENCE_VERSION,
+  };
+}
+
+function readProgress(key: string): UserProgress | null {
+  try {
+    const data = localStorage.getItem(key);
+    return data ? normalizeProgress(JSON.parse(data) as Partial<UserProgress>) : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeLocalProgress(uid: string | null, progress: UserProgress): void {
+  try {
+    localStorage.setItem(progressStorageKey(uid), JSON.stringify(progress));
+  } catch (error) {
+    console.error('Failed to cache progress in this browser:', error);
+  }
+}
+
+function progressPayload(progress: UserProgress) {
+  return {
+    completedLessons: progress.completedLessons,
+    bookmarkedMCQs: progress.bookmarkedMCQs,
+    mcqBestScores: progress.mcqBestScores,
+    solvedProblems: progress.solvedProblems,
+    savedCode: progress.savedCode,
+    theme: progress.theme,
+    themePreferenceVersion: progress.themePreferenceVersion,
+    timerEnabled: progress.timerEnabled,
+    streak: progress.streak,
+    loginStreakVersion: progress.loginStreakVersion,
+  };
+}
 
 function notifyListeners() {
   listeners.forEach((l) => l());
@@ -51,12 +121,16 @@ export const storageService = {
 
   // Initialize service when user logs in or switches
   async initForUser(uid: string | null): Promise<void> {
+    if (saveDebounceTimer) clearTimeout(saveDebounceTimer);
+    saveDebounceTimer = null;
+    const thisInitialization = ++initializationId;
     currentUid = uid;
+    cloudReadyUid = null;
+    this.loadFromLocalStorage(uid);
+    isInitialized = true;
+    notifyListeners();
 
     if (!uid || uid.startsWith('local_') || !supabase) {
-      this.loadFromLocalStorage();
-      isInitialized = true;
-      notifyListeners();
       return;
     }
 
@@ -67,57 +141,41 @@ export const storageService = {
         .eq('user_id', uid)
         .maybeSingle();
       if (error) throw error;
+      if (thisInitialization !== initializationId) return;
 
       if (data?.progress) {
-        const remoteProgress = data.progress as Partial<UserProgress>;
-        const isLegacyStreak = remoteProgress.loginStreakVersion !== LOGIN_STREAK_VERSION;
-        const hasSavedThemePreference = remoteProgress.themePreferenceVersion === THEME_PREFERENCE_VERSION;
-        inMemoryProgress = {
-          ...defaultProgress,
-          ...remoteProgress,
-          theme: hasSavedThemePreference ? remoteProgress.theme ?? defaultProgress.theme : 'light',
-          streak: isLegacyStreak
-            ? { ...defaultProgress.streak }
-            : { ...defaultProgress.streak, ...remoteProgress.streak },
-          loginStreakVersion: LOGIN_STREAK_VERSION,
-          themePreferenceVersion: THEME_PREFERENCE_VERSION,
-        };
+        inMemoryProgress = normalizeProgress(data.progress as Partial<UserProgress>);
+        writeLocalProgress(uid, inMemoryProgress);
       } else {
-        const local = this.loadFromLocalStorage();
-        inMemoryProgress = local;
-        await this.syncToSupabase(inMemoryProgress, true);
+        const scopedProgress = readProgress(progressStorageKey(uid));
+        const legacyProgress = scopedProgress ? null : readProgress(STORAGE_KEY);
+        inMemoryProgress = scopedProgress ?? legacyProgress ?? createDefaultProgress();
+        await this.writeProgressToSupabase(uid, inMemoryProgress);
+        if (thisInitialization !== initializationId) return;
+        if (legacyProgress) localStorage.removeItem(STORAGE_KEY);
       }
+      cloudReadyUid = uid;
     } catch (err) {
-      console.error('Failed to load progress from Supabase; using local cache:', err);
-      this.loadFromLocalStorage();
+      if (thisInitialization !== initializationId) return;
+      console.error('Failed to load progress from Supabase; cloud writes are paused:', err);
+      inMemoryProgress = readProgress(progressStorageKey(uid)) ?? createDefaultProgress();
     }
 
     isInitialized = true;
     notifyListeners();
   },
 
-  loadFromLocalStorage(): UserProgress {
-    try {
-      const data = localStorage.getItem(STORAGE_KEY);
-      if (data) {
-        const parsed = JSON.parse(data) as Partial<UserProgress>;
-        const isLegacyStreak = parsed.loginStreakVersion !== LOGIN_STREAK_VERSION;
-        const hasSavedThemePreference = parsed.themePreferenceVersion === THEME_PREFERENCE_VERSION;
-        inMemoryProgress = {
-          ...defaultProgress,
-          ...parsed,
-          theme: hasSavedThemePreference ? parsed.theme ?? defaultProgress.theme : 'light',
-          streak: isLegacyStreak
-            ? { ...defaultProgress.streak }
-            : { ...defaultProgress.streak, ...parsed.streak },
-          loginStreakVersion: LOGIN_STREAK_VERSION,
-          themePreferenceVersion: THEME_PREFERENCE_VERSION,
-        };
-      } else {
-        inMemoryProgress = { ...defaultProgress };
-      }
-    } catch {
-      inMemoryProgress = { ...defaultProgress };
+  loadFromLocalStorage(uid: string | null = currentUid): UserProgress {
+    const key = progressStorageKey(uid);
+    const scopedProgress = readProgress(key);
+    const legacyProgress = uid && !uid.startsWith('local_') ? null : (
+      scopedProgress ? null : readProgress(STORAGE_KEY)
+    );
+    inMemoryProgress = scopedProgress ?? legacyProgress ?? createDefaultProgress();
+
+    if (uid && legacyProgress) {
+      writeLocalProgress(uid, legacyProgress);
+      localStorage.removeItem(STORAGE_KEY);
     }
     return inMemoryProgress;
   },
@@ -125,38 +183,15 @@ export const storageService = {
   // Sync state to Supabase (debounced or immediate)
   async syncToSupabase(progress: UserProgress, immediate = false): Promise<void> {
     // Always mirror to localStorage for offline access
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
-    } catch {
-      // safe
-    }
-
     const uid = currentUid;
+    writeLocalProgress(uid, progress);
     const client = supabase;
-    if (!uid || uid.startsWith('local_') || !client) return;
+    if (!uid || uid.startsWith('local_') || !client || cloudReadyUid !== uid) return;
 
     const doWrite = async () => {
+      if (currentUid !== uid || cloudReadyUid !== uid) return;
       try {
-        const { error } = await client.from('user_progress').upsert(
-          {
-            user_id: uid,
-            progress: {
-              completedLessons: progress.completedLessons,
-              bookmarkedMCQs: progress.bookmarkedMCQs,
-              mcqBestScores: progress.mcqBestScores,
-              solvedProblems: progress.solvedProblems,
-              savedCode: progress.savedCode,
-              theme: progress.theme,
-              themePreferenceVersion: progress.themePreferenceVersion,
-              timerEnabled: progress.timerEnabled,
-              streak: progress.streak,
-              loginStreakVersion: progress.loginStreakVersion,
-            },
-            updated_at: new Date().toISOString(),
-          },
-          { onConflict: 'user_id' }
-        );
-        if (error) throw error;
+        await this.writeProgressToSupabase(uid, progress);
       } catch (error) {
         console.error('Failed writing progress to Supabase:', error);
       }
@@ -167,8 +202,25 @@ export const storageService = {
       await doWrite();
     } else {
       if (saveDebounceTimer) clearTimeout(saveDebounceTimer);
-      saveDebounceTimer = setTimeout(doWrite, 800); // 800ms debounce
+      saveDebounceTimer = setTimeout(() => {
+        saveDebounceTimer = null;
+        void doWrite();
+      }, 800); // 800ms debounce
     }
+  },
+
+  async writeProgressToSupabase(uid: string, progress: UserProgress): Promise<void> {
+    if (!supabase) return;
+    const { error } = await supabase.from('user_progress').upsert(
+      {
+        user_id: uid,
+        progress: progressPayload(progress),
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'user_id' }
+    );
+    if (error) throw error;
+    writeLocalProgress(uid, progress);
   },
 
   getProgress(): UserProgress {
@@ -329,8 +381,9 @@ export const storageService = {
   },
 
   resetAllProgress(): void {
-    localStorage.removeItem(STORAGE_KEY);
-    inMemoryProgress = { ...defaultProgress };
+    localStorage.removeItem(progressStorageKey(currentUid));
+    inMemoryProgress = createDefaultProgress();
+    void this.syncToSupabase(inMemoryProgress, true);
     notifyListeners();
   },
 };

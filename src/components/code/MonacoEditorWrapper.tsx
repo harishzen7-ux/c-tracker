@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import Editor, { OnMount } from '@monaco-editor/react';
-import { CNeumorphicEditor } from './CNeumorphicEditor';
 
 interface MonacoEditorWrapperProps {
   value: string;
@@ -8,8 +7,6 @@ interface MonacoEditorWrapperProps {
   fontSize?: number;
   height?: string;
   readOnly?: boolean;
-  mode?: 'monaco' | 'native';
-  onModeToggle?: () => void;
 }
 
 const MacEditorFrame: React.FC<{ children: React.ReactNode }> = ({ children }) => (
@@ -43,8 +40,6 @@ export const MonacoEditorWrapper: React.FC<MonacoEditorWrapperProps> = ({
   fontSize = 14,
   height = '380px',
   readOnly = false,
-  mode = 'monaco',
-  onModeToggle,
 }) => {
   const [isLightMode, setIsLightMode] = useState<boolean>(() => {
     return typeof document !== 'undefined' && document.documentElement.classList.contains('light');
@@ -124,8 +119,6 @@ export const MonacoEditorWrapper: React.FC<MonacoEditorWrapperProps> = ({
     }
   };
 
-  const monacoRef = React.useRef<any>(null);
-
   // Sync theme when isLightMode toggles
   useEffect(() => {
     if (window && (window as any).monaco) {
@@ -136,21 +129,6 @@ export const MonacoEditorWrapper: React.FC<MonacoEditorWrapperProps> = ({
       }
     }
   }, [isLightMode]);
-
-  // If Monaco errored or user explicitly prefers the native editor
-  if (mode === 'native') {
-    return (
-      <MacEditorFrame>
-        <CNeumorphicEditor
-          value={value}
-          onChange={onChange}
-          fontSize={fontSize}
-          height={height}
-          readOnly={readOnly}
-        />
-      </MacEditorFrame>
-    );
-  }
 
   return (
     <MacEditorFrame>
@@ -167,7 +145,6 @@ export const MonacoEditorWrapper: React.FC<MonacoEditorWrapperProps> = ({
           value={value}
           onChange={(val) => onChange(val || '')}
           onMount={(editor, monaco) => {
-            monacoRef.current = monaco;
             handleEditorDidMount(editor, monaco);
           }}
           theme={isLightMode ? 'cTrackerLight' : 'cTrackerDark'}
@@ -190,15 +167,6 @@ export const MonacoEditorWrapper: React.FC<MonacoEditorWrapperProps> = ({
           loading={
             <div className="flex flex-col items-center justify-center h-full gap-2 p-6 text-xs font-mono text-[var(--neu-text-muted)]">
               <span>Loading C Editor Environment...</span>
-              {onModeToggle && (
-                <button
-                  type="button"
-                  onClick={onModeToggle}
-                  className="text-[11px] text-[var(--neu-accent)] underline hover:opacity-80 cursor-pointer"
-                >
-                  Switch to lightweight editor
-                </button>
-              )}
             </div>
           }
         />

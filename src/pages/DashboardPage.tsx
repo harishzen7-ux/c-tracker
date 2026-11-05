@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { getAllTopics, getTopicLessons, getTopicMCQs, getTopicCodingQuestions } from '../data';
 import { TopicMeta, TopicStatus } from '../types';
 import { storageService } from '../services/storageService';
@@ -191,10 +191,32 @@ export const DashboardPage: React.FC = () => {
               Complete each topic's Learning Arena, 50-question MCQ diagnosis, and 25 coding challenges.
             </p>
           </div>
-          <span className="text-xs font-mono text-[var(--neu-accent)]">
+          <span className="hidden rounded-full px-3 py-1 text-xs font-mono text-[var(--neu-accent)] neu-inset sm:inline-flex">
             4 Core Domains · Phase 1
           </span>
         </div>
+
+        <Link
+          to="/getting-started"
+          className="group relative flex flex-col items-center justify-between gap-6 overflow-hidden rounded-[24px] border border-[var(--neu-accent)]/30 bg-gradient-to-r from-[var(--neu-accent)]/8 via-[var(--neu-surface)] to-[var(--neu-accent)]/5 p-6 shadow-[0_12px_36px_rgba(0,0,0,0.12)] transition-all duration-300 hover:-translate-y-1 hover:border-[var(--neu-accent)]/50 hover:shadow-[0_18px_42px_rgba(255,122,26,0.2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--neu-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--neu-base)] sm:flex-row sm:gap-8 sm:p-7"
+        >
+          <span className="pointer-events-none absolute -right-10 -top-16 h-48 w-48 rounded-full bg-[var(--neu-accent)]/5 blur-3xl transition-colors duration-300 group-hover:bg-[var(--neu-accent)]/10" />
+          <span className="relative flex-1 text-center sm:text-left">
+              <span className="mb-1 block text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--neu-accent)]">
+                START HERE
+              </span>
+              <span className="block text-lg font-extrabold tracking-tight text-[var(--neu-text-primary)] sm:text-xl">
+                New to C programming?
+              </span>
+              <span className="mt-1 block max-w-xl text-xs leading-relaxed text-[var(--neu-text-secondary)] sm:text-sm">
+                Get the essentials, explore what C can do, and find your first steps in the curriculum.
+              </span>
+          </span>
+          <span className="begin-cta relative inline-flex min-h-[54px] min-w-[210px] shrink-0 items-center justify-center gap-2 rounded-full px-8 text-sm font-bold shadow-[0_8px_24px_rgba(255,122,26,0.24)] transition-transform duration-200 group-hover:scale-[1.03] sm:min-h-[60px] sm:text-base">
+            <span>Where you begin</span>
+            <span aria-hidden="true">→</span>
+          </span>
+        </Link>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {topicStats.map((ts) => (
