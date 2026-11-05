@@ -10,8 +10,6 @@ interface AuthContextType {
   loading: boolean;
   login: (username: string, pass: string) => Promise<UserProfile>;
   signup: (username: string, pass: string) => Promise<UserProfile>;
-  loginLocally: (username: string, pass: string) => Promise<UserProfile>;
-  signupLocally: (username: string, pass: string) => Promise<UserProfile>;
   logout: () => Promise<void>;
   refreshProfile: () => Promise<void>;
 }
@@ -73,28 +71,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signup = async (username: string, pass: string) => {
     const prof = await authService.signup(username, pass);
-    setProfile(prof);
-    return prof;
-  };
-
-  const loginLocally = async (username: string, pass: string) => {
-    const prof = await authService.loginLocal(username, pass);
-    setCurrentUser({
-      uid: prof.uid,
-      displayName: prof.username,
-      email: `${prof.usernameLower}@ctracker.local`,
-    });
-    setProfile(prof);
-    return prof;
-  };
-
-  const signupLocally = async (username: string, pass: string) => {
-    const prof = await authService.signupLocal(username, pass);
-    setCurrentUser({
-      uid: prof.uid,
-      displayName: prof.username,
-      email: `${prof.usernameLower}@ctracker.local`,
-    });
+    if (prof.uid.startsWith('local_')) {
+      setCurrentUser({
+        uid: prof.uid,
+        displayName: prof.username,
+        email: `${prof.usernameLower}@ctracker.local`,
+      });
+    }
     setProfile(prof);
     return prof;
   };
@@ -119,8 +102,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loading,
         login,
         signup,
-        loginLocally,
-        signupLocally,
         logout,
         refreshProfile,
       }}

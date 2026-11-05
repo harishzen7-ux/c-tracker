@@ -10,30 +10,12 @@ export const LoginPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isAuthNotAllowed, setIsAuthNotAllowed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [lockoutSeconds, setLockoutSeconds] = useState(0);
 
-  const { login, loginLocally } = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-
-  const handleContinueLocally = async () => {
-    if (!username.trim() || !password) {
-      setError('Please enter both username and password.');
-      return;
-    }
-    setIsSubmitting(true);
-    try {
-      await loginLocally(username.trim(), password);
-      const destination = (location.state as any)?.from?.pathname || '/dashboard';
-      navigate(destination, { replace: true });
-    } catch (err: any) {
-      setError(err.message || 'Local login failed.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   // Check lockout on mount and when username changes
   useEffect(() => {
@@ -63,7 +45,6 @@ export const LoginPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    setIsAuthNotAllowed(false);
 
     if (lockoutSeconds > 0) {
       setError(`Account locked. Please wait ${lockoutSeconds}s before retrying.`);
@@ -81,21 +62,17 @@ export const LoginPage: React.FC = () => {
       const destination = (location.state as any)?.from?.pathname || '/dashboard';
       navigate(destination, { replace: true });
     } catch (err: any) {
-      if (err?.code === 'auth/operation-not-allowed' || err?.message?.includes('operation-not-allowed')) {
-        setIsAuthNotAllowed(true);
+      const rem = authService.getRemainingLockout(username.trim());
+      if (rem > 0) {
+        setLockoutSeconds(rem);
+        setError(`Too many failed attempts. Account locked for ${rem}s.`);
+      } else if (
+        err?.message?.startsWith('Unable to ') ||
+        err?.message?.startsWith('Too many sign-in attempts')
+      ) {
+        setError(err.message);
       } else {
-        const rem = authService.getRemainingLockout(username.trim());
-        if (rem > 0) {
-          setLockoutSeconds(rem);
-          setError(`Too many failed attempts. Account locked for ${rem}s.`);
-        } else if (
-          err?.message?.startsWith('Unable to ') ||
-          err?.message?.startsWith('Too many sign-in attempts')
-        ) {
-          setError(err.message);
-        } else {
-          setError('Invalid username or password');
-        }
+        setError('Invalid username or password');
       }
     } finally {
       setIsSubmitting(false);
@@ -123,36 +100,6 @@ export const LoginPage: React.FC = () => {
         {/* Card Form */}
         <NeuCard className="p-6 sm:p-8 flex flex-col gap-6">
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-            {/* Helpful resolution banner when Firebase Email/Password is disabled */}
-            {isAuthNotAllowed && (
-              <div className="p-4 rounded-xl neu-inset bg-amber-500/10 border border-amber-500/30 flex flex-col gap-3 text-xs">
-                <div className="flex items-start gap-2.5">
-                  <span className="text-amber-500 text-base leading-none">ℹ️</span>
-                  <div className="flex flex-col gap-1">
-                    <span className="font-bold text-amber-700 dark:text-amber-300">
-                      Firebase Email/Password Auth Disabled
-                    </span>
-                    <p className="text-[var(--neu-text-secondary)] leading-relaxed">
-                      Your Firebase project hasn't enabled Email/Password sign-ins in the console yet. You can continue instantly below:
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex flex-col sm:flex-row gap-2 pt-1">
-                  <NeuButton
-                    type="button"
-                    variant="primary"
-                    size="sm"
-                    onClick={handleContinueLocally}
-                    disabled={isSubmitting}
-                    className="flex-1 text-xs"
-                  >
-                    Log In Locally
-                  </NeuButton>
-                </div>
-              </div>
-            )}
-
             {/* Inline Error Message */}
             {error && (
               <div className="p-3.5 rounded-xl neu-inset bg-red-500/10 border border-red-500/30 text-rose-700 dark:text-rose-400 text-xs font-semibold">

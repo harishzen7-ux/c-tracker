@@ -17,23 +17,10 @@ export const SignupPage: React.FC = () => {
   const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
   const [usernameError, setUsernameError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [isAuthNotAllowed, setIsAuthNotAllowed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { signup, signupLocally } = useAuth();
+  const { signup } = useAuth();
   const navigate = useNavigate();
-
-  const handleContinueLocally = async () => {
-    setIsSubmitting(true);
-    try {
-      await signupLocally(username.trim(), password);
-      navigate('/dashboard', { replace: true });
-    } catch (err: any) {
-      setError(err.message || 'Failed to initialize local session.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   // Debounced check for username availability
   useEffect(() => {
@@ -88,7 +75,6 @@ export const SignupPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    setIsAuthNotAllowed(false);
 
     // Final checks
     const uVal = authService.validateUsername(username.trim());
@@ -117,11 +103,7 @@ export const SignupPage: React.FC = () => {
       await signup(username.trim(), password);
       navigate('/dashboard', { replace: true });
     } catch (err: any) {
-      if (err?.code === 'auth/operation-not-allowed' || err?.message?.includes('operation-not-allowed')) {
-        setIsAuthNotAllowed(true);
-      } else {
-        setError(err.message || 'Failed to create account. Please try again.');
-      }
+      setError(err.message || 'Failed to create account. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -148,36 +130,6 @@ export const SignupPage: React.FC = () => {
         {/* Card Form */}
         <NeuCard className="p-6 sm:p-8 flex flex-col gap-6">
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-            {/* Helpful resolution banner when Firebase Email/Password is disabled */}
-            {isAuthNotAllowed && (
-              <div className="p-4 rounded-xl neu-inset bg-amber-500/10 border border-amber-500/30 flex flex-col gap-3 text-xs">
-                <div className="flex items-start gap-2.5">
-                  <span className="text-amber-500 text-base leading-none">ℹ️</span>
-                  <div className="flex flex-col gap-1">
-                    <span className="font-bold text-amber-700 dark:text-amber-300">
-                      Firebase Email/Password Auth Disabled
-                    </span>
-                    <p className="text-[var(--neu-text-secondary)] leading-relaxed">
-                      Your Firebase project hasn't enabled Email/Password sign-ins in the console yet. You can continue instantly below:
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex flex-col sm:flex-row gap-2 pt-1">
-                  <NeuButton
-                    type="button"
-                    variant="primary"
-                    size="sm"
-                    onClick={handleContinueLocally}
-                    disabled={isSubmitting}
-                    className="flex-1 text-xs"
-                  >
-                    Start as {username.trim() || 'Harish'} (Instant Session)
-                  </NeuButton>
-                </div>
-              </div>
-            )}
-
             {/* Standard Error Message */}
             {error && (
               <div className="p-3.5 rounded-xl neu-inset bg-red-500/10 border border-red-500/30 text-rose-700 dark:text-rose-400 text-xs font-semibold">

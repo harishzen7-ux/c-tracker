@@ -273,11 +273,8 @@ export const authService = {
       this.clearFailedLogins(usernameTrimmed);
       return profile;
     } catch (err: any) {
-      // Re-throw with code preserved so the UI can detect auth/operation-not-allowed
       if (err?.code === 'auth/operation-not-allowed' || err?.message?.includes('operation-not-allowed')) {
-        const notAllowedErr: any = new Error('Firebase: Error (auth/operation-not-allowed)');
-        notAllowedErr.code = 'auth/operation-not-allowed';
-        throw notAllowedErr;
+        return this.signupLocal(usernameTrimmed, password);
       }
       throw err;
     }
@@ -392,11 +389,8 @@ export const authService = {
       const cred = await signInWithEmailAndPassword(auth, email, password);
       uid = cred.user.uid;
     } catch (err: any) {
-      // If operation is not allowed, check local user fallback or re-throw
       if (err?.code === 'auth/operation-not-allowed' || err?.message?.includes('operation-not-allowed')) {
-        const notAllowedErr: any = new Error('Firebase: Error (auth/operation-not-allowed)');
-        notAllowedErr.code = 'auth/operation-not-allowed';
-        throw notAllowedErr;
+        return this.loginLocal(usernameTrimmed, password);
       }
 
       if (err?.code === 'auth/network-request-failed') {
