@@ -3,6 +3,7 @@ import { UserProgress, TopicId } from '../types';
 
 const STORAGE_KEY = 'c_tracker_user_progress_v1';
 const LOGIN_STREAK_VERSION = 1;
+const THEME_PREFERENCE_VERSION = 1;
 
 function getLocalDateString(date = new Date()): string {
   const year = date.getFullYear();
@@ -22,7 +23,8 @@ const defaultProgress: UserProgress = {
     lastActiveDate: '',
   },
   loginStreakVersion: LOGIN_STREAK_VERSION,
-  theme: 'dark',
+  themePreferenceVersion: THEME_PREFERENCE_VERSION,
+  theme: 'light',
   timerEnabled: false,
 };
 
@@ -69,13 +71,16 @@ export const storageService = {
       if (data?.progress) {
         const remoteProgress = data.progress as Partial<UserProgress>;
         const isLegacyStreak = remoteProgress.loginStreakVersion !== LOGIN_STREAK_VERSION;
+        const hasSavedThemePreference = remoteProgress.themePreferenceVersion === THEME_PREFERENCE_VERSION;
         inMemoryProgress = {
           ...defaultProgress,
           ...remoteProgress,
+          theme: hasSavedThemePreference ? remoteProgress.theme ?? defaultProgress.theme : 'light',
           streak: isLegacyStreak
             ? { ...defaultProgress.streak }
             : { ...defaultProgress.streak, ...remoteProgress.streak },
           loginStreakVersion: LOGIN_STREAK_VERSION,
+          themePreferenceVersion: THEME_PREFERENCE_VERSION,
         };
       } else {
         const local = this.loadFromLocalStorage();
@@ -97,13 +102,16 @@ export const storageService = {
       if (data) {
         const parsed = JSON.parse(data) as Partial<UserProgress>;
         const isLegacyStreak = parsed.loginStreakVersion !== LOGIN_STREAK_VERSION;
+        const hasSavedThemePreference = parsed.themePreferenceVersion === THEME_PREFERENCE_VERSION;
         inMemoryProgress = {
           ...defaultProgress,
           ...parsed,
+          theme: hasSavedThemePreference ? parsed.theme ?? defaultProgress.theme : 'light',
           streak: isLegacyStreak
             ? { ...defaultProgress.streak }
             : { ...defaultProgress.streak, ...parsed.streak },
           loginStreakVersion: LOGIN_STREAK_VERSION,
+          themePreferenceVersion: THEME_PREFERENCE_VERSION,
         };
       } else {
         inMemoryProgress = { ...defaultProgress };
@@ -139,6 +147,7 @@ export const storageService = {
               solvedProblems: progress.solvedProblems,
               savedCode: progress.savedCode,
               theme: progress.theme,
+              themePreferenceVersion: progress.themePreferenceVersion,
               timerEnabled: progress.timerEnabled,
               streak: progress.streak,
               loginStreakVersion: progress.loginStreakVersion,
@@ -293,6 +302,7 @@ export const storageService = {
   setTheme(theme: 'dark' | 'light'): void {
     const progress = this.getProgress();
     progress.theme = theme;
+    progress.themePreferenceVersion = THEME_PREFERENCE_VERSION;
     inMemoryProgress = progress;
     this.syncToSupabase(progress, true);
     if (theme === 'light') {

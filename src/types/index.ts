@@ -93,6 +93,7 @@ export interface UserProgress {
     lastActiveDate: string;
   };
   loginStreakVersion: number;
+  themePreferenceVersion: number;
   theme: 'dark' | 'light';
   timerEnabled: boolean;
 }
