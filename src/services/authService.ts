@@ -3,8 +3,6 @@ import {
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
-  GoogleAuthProvider,
-  signInWithPopup,
   User as FirebaseUser,
 } from 'firebase/auth';
 import {
@@ -24,7 +22,6 @@ export interface UserProfile {
   streak: number;
   lastActiveDate: string;
   lastVisited?: string;
-  photoURL?: string;
 }
 
 // Convert username to hidden internal email format
@@ -172,14 +169,8 @@ export const authService = {
       return true;
     }
 
-    try {
-      const snap = await getDoc(doc(db, 'usernames', usernameLower));
-      return snap.exists();
-    } catch (e) {
-      // In case rules block or offline, assume available or handle error
-      console.warn('Error checking username availability:', e);
-      return false;
-    }
+    const snap = await getDoc(doc(db, 'usernames', usernameLower));
+    return snap.exists();
   },
 
   // Check remaining lockout seconds for a given username
@@ -196,6 +187,10 @@ export const authService = {
     const lower = username.trim().toLowerCase();
     const map = getLockoutMap();
     const current = map[lower] || { attempts: 0, lockedUntil: 0 };
+    if (current.lockedUntil > 0 && current.lockedUntil <= Date.now()) {
+      current.attempts = 0;
+      current.lockedUntil = 0;
+    }
 
     current.attempts += 1;
     let remainingSeconds = 0;
@@ -304,6 +299,7 @@ export const authService = {
       throw new Error('Username is already taken');
     }
 
+    await signOut(auth);
     const passwordHash = await hashPassword(password);
     const now = new Date().toISOString();
     const today = now.split('T')[0];
@@ -333,11 +329,17 @@ export const authService = {
   // LOGIN Local
   async loginLocal(username: string, password: string): Promise<UserProfile> {
     const usernameTrimmed = username.trim();
+    const remaining = this.getRemainingLockout(usernameTrimmed);
+    if (remaining > 0) {
+      throw new Error(`Too many failed attempts. Account locked for ${remaining}s.`);
+    }
+
     const usernameLower = usernameTrimmed.toLowerCase();
     const localUsers = getLocalUsers();
     const user = localUsers[usernameLower];
 
     if (!user) {
+      this.recordFailedLogin(usernameTrimmed);
       throw new Error('Invalid username or password');
     }
 
@@ -347,6 +349,7 @@ export const authService = {
       throw new Error('Invalid username or password');
     }
 
+    await signOut(auth);
     const now = new Date().toISOString();
     user.lastLoginAt = now;
     localUsers[usernameLower] = user;
@@ -367,7 +370,7 @@ export const authService = {
     return profile;
   },
 
-  // LOGIN (Tries Firebase first, then fallback to local)
+  // LOGIN (Uses a local account when one exists, otherwise Firebase)
   async login(username: string, password: string): Promise<UserProfile> {
     const usernameTrimmed = username.trim();
     const remaining = this.getRemainingLockout(usernameTrimmed);
@@ -384,41 +387,10 @@ export const authService = {
 
     const email = usernameToEmail(usernameTrimmed);
 
+    let uid: string;
     try {
       const cred = await signInWithEmailAndPassword(auth, email, password);
-      const uid = cred.user.uid;
-
-      // Fetch user profile
-      const userDoc = await getDoc(doc(db, 'users', uid));
-      let profile: UserProfile;
-
-      const now = new Date().toISOString();
-      const today = now.split('T')[0];
-
-      if (userDoc.exists()) {
-        profile = userDoc.data() as UserProfile;
-        try {
-          await updateDoc(doc(db, 'users', uid), {
-            lastLoginAt: now,
-          });
-        } catch {
-          // non-fatal
-        }
-      } else {
-        profile = {
-          uid,
-          username: usernameTrimmed,
-          usernameLower: usernameTrimmed.toLowerCase(),
-          createdAt: now,
-          lastLoginAt: now,
-          streak: 1,
-          lastActiveDate: today,
-        };
-        await setDoc(doc(db, 'users', uid), profile);
-      }
-
-      this.clearFailedLogins(usernameTrimmed);
-      return profile;
+      uid = cred.user.uid;
     } catch (err: any) {
       // If operation is not allowed, check local user fallback or re-throw
       if (err?.code === 'auth/operation-not-allowed' || err?.message?.includes('operation-not-allowed')) {
@@ -427,74 +399,53 @@ export const authService = {
         throw notAllowedErr;
       }
 
-      this.recordFailedLogin(usernameTrimmed);
-      throw new Error('Invalid username or password');
-    }
-  },
+      if (err?.code === 'auth/network-request-failed') {
+        throw new Error('Unable to connect. Check your internet connection and try again.');
+      }
 
-  // GOOGLE SIGN IN
-  async loginWithGoogle(): Promise<UserProfile> {
-    const provider = new GoogleAuthProvider();
-    provider.setCustomParameters({ prompt: 'select_account' });
-    const result = await signInWithPopup(auth, provider);
-    const user = result.user;
-    const uid = user.uid;
+      if (err?.code === 'auth/too-many-requests') {
+        throw new Error('Too many sign-in attempts. Please wait and try again.');
+      }
+
+      if (
+        err?.code === 'auth/user-not-found' ||
+        err?.code === 'auth/wrong-password' ||
+        err?.code === 'auth/invalid-credential' ||
+        err?.code === 'auth/invalid-email'
+      ) {
+        this.recordFailedLogin(usernameTrimmed);
+        throw new Error('Invalid username or password');
+      }
+
+      throw new Error('Unable to sign in right now. Please try again.');
+    }
 
     const userDoc = await getDoc(doc(db, 'users', uid));
     const now = new Date().toISOString();
     const today = now.split('T')[0];
 
+    let profile: UserProfile;
     if (userDoc.exists()) {
-      const profile = userDoc.data() as UserProfile;
+      profile = userDoc.data() as UserProfile;
       try {
         await updateDoc(doc(db, 'users', uid), { lastLoginAt: now });
-      } catch {}
-      this.clearLocalSession();
-      return profile;
-    }
-
-    // Generate safe username
-    let base = (user.displayName || user.email?.split('@')[0] || 'c_developer')
-      .toLowerCase()
-      .replace(/[^a-z0-9_]/g, '_')
-      .slice(0, 15);
-    if (base.length < 4) base = `${base}_dev`;
-    if (!/^[a-z]/.test(base)) base = `u_${base}`;
-
-    let candidate = base;
-    let count = 1;
-    while (await this.isUsernameTaken(candidate)) {
-      candidate = `${base.slice(0, 13)}_${count}`;
-      count++;
-    }
-
-    const profile: UserProfile = {
-      uid,
-      username: candidate,
-      usernameLower: candidate.toLowerCase(),
-      createdAt: now,
-      lastLoginAt: now,
-      streak: 1,
-      lastActiveDate: today,
-      photoURL: user.photoURL || undefined,
-    };
-
-    try {
-      await setDoc(doc(db, 'usernames', candidate.toLowerCase()), {
+      } catch {
+        // Profile metadata updates are non-critical to sign-in.
+      }
+    } else {
+      profile = {
         uid,
+        username: usernameTrimmed,
+        usernameLower,
         createdAt: now,
-      });
-    } catch (err) {
-      console.warn('Could not write username mapping:', err);
-    }
-
-    try {
+        lastLoginAt: now,
+        streak: 1,
+        lastActiveDate: today,
+      };
       await setDoc(doc(db, 'users', uid), profile);
-    } catch (err) {
-      console.warn('Could not write user profile:', err);
     }
 
-    this.clearLocalSession();
+    this.clearFailedLogins(usernameTrimmed);
     return profile;
   },
 

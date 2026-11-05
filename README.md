@@ -43,8 +43,8 @@ Firebase is provisioned via AI Studio into `firebase-applet-config.json` with Fi
 Optional environment variables in `.env`:
 ```env
 # Optional remote Judge0 API runner endpoint for C code execution
-VITE_JUDGE0_API_URL=https://judge0-ce.p.rapidapi.com
-VITE_JUDGE0_API_KEY=YOUR_OPTIONAL_KEY
+VITE_JUDGE0_URL=https://judge0-ce.p.rapidapi.com
+VITE_JUDGE0_KEY=YOUR_OPTIONAL_KEY
 ```
 
 ---

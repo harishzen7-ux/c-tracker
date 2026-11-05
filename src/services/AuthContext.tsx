@@ -2,13 +2,14 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User as FirebaseUser } from 'firebase/auth';
 import { authService, UserProfile } from './authService';
 
+type AuthUser = Pick<FirebaseUser, 'uid' | 'displayName' | 'email'>;
+
 interface AuthContextType {
-  currentUser: FirebaseUser | null;
+  currentUser: AuthUser | null;
   profile: UserProfile | null;
   loading: boolean;
   login: (username: string, pass: string) => Promise<UserProfile>;
   signup: (username: string, pass: string) => Promise<UserProfile>;
-  loginWithGoogle: () => Promise<UserProfile>;
   loginLocally: (username: string, pass: string) => Promise<UserProfile>;
   signupLocally: (username: string, pass: string) => Promise<UserProfile>;
   logout: () => Promise<void>;
@@ -18,7 +19,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
+  const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -44,7 +45,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             uid: local.uid,
             displayName: local.username,
             email: `${local.usernameLower}@ctracker.local`,
-          } as any);
+          });
           setProfile(local);
         } else {
           setCurrentUser(null);
@@ -64,7 +65,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         uid: prof.uid,
         displayName: prof.username,
         email: `${prof.usernameLower}@ctracker.local`,
-      } as any);
+      });
     }
     setProfile(prof);
     return prof;
@@ -76,19 +77,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return prof;
   };
 
-  const loginWithGoogle = async () => {
-    const prof = await authService.loginWithGoogle();
-    setProfile(prof);
-    return prof;
-  };
-
   const loginLocally = async (username: string, pass: string) => {
     const prof = await authService.loginLocal(username, pass);
     setCurrentUser({
       uid: prof.uid,
       displayName: prof.username,
       email: `${prof.usernameLower}@ctracker.local`,
-    } as any);
+    });
     setProfile(prof);
     return prof;
   };
@@ -99,7 +94,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       uid: prof.uid,
       displayName: prof.username,
       email: `${prof.usernameLower}@ctracker.local`,
-    } as any);
+    });
     setProfile(prof);
     return prof;
   };
@@ -124,7 +119,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loading,
         login,
         signup,
-        loginWithGoogle,
         loginLocally,
         signupLocally,
         logout,
