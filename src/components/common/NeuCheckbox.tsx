@@ -31,7 +31,7 @@ export const NeuCheckbox: React.FC<NeuCheckboxProps> = ({
           disabled={disabled}
         />
         <div
-          className={`w-5 h-5 rounded-md flex items-center justify-center transition-all duration-150 ${
+          className={`w-5 h-5 rounded-md flex items-center justify-center transition-[color,background-color,box-shadow,transform] duration-150 ${
             checked
               ? 'neu-inset border border-[var(--neu-accent)]/50 shadow-[inset_2px_2px_4px_rgba(0,0,0,0.6),0_0_8px_var(--neu-accent-glow)]'
               : 'neu-inset'

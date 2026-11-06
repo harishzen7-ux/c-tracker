@@ -95,7 +95,7 @@ export const Navbar: React.FC<NavbarProps> = ({ theme, onThemeChange }) => {
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="lg:hidden mt-3 pt-3 border-t border-[var(--neu-border)] flex flex-col gap-2 animate-in fade-in duration-200">
+        <div className="lg:hidden mt-3 pt-3 border-t border-[var(--neu-border)] flex flex-col gap-2">
           {navLinks.map((link) => {
             const isActive = location.pathname === link.path;
             return (
@@ -103,7 +103,7 @@ export const Navbar: React.FC<NavbarProps> = ({ theme, onThemeChange }) => {
                 key={link.path}
                 to={link.path}
                 onClick={() => setMobileMenuOpen(false)}
-                className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-[color,background-color,box-shadow,transform] ${
                   isActive
                     ? 'neu-inset text-[var(--neu-accent)] font-semibold'
                     : 'text-[var(--neu-text-secondary)] hover:text-[var(--neu-text-primary)] hover:bg-white/5'

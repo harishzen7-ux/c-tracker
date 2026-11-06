@@ -37,7 +37,7 @@ export function NeuSegmented<T extends string = string>({
             role="tab"
             aria-selected={isActive}
             onClick={() => onChange(option.id)}
-            className={`flex min-w-0 items-center justify-center gap-1 rounded-xl text-center transition-all duration-200 outline-none select-none font-medium cursor-pointer sm:gap-2 md:rounded-full md:whitespace-nowrap ${
+            className={`flex min-w-0 items-center justify-center gap-1 rounded-xl text-center transition-[color,background-color,box-shadow,transform] duration-200 outline-none select-none font-medium cursor-pointer sm:gap-2 md:rounded-full md:whitespace-nowrap ${
               isSm ? 'px-3 py-1 text-xs' : 'px-4.5 py-2 text-xs sm:text-sm'
             } ${
               isActive

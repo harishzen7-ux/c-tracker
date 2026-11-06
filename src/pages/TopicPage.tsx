@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { TopicId } from '../types';
 import {
   getTopicMeta,
@@ -20,11 +20,17 @@ type ArenaTab = 'learn' | 'mcq' | 'code';
 export const TopicPage: React.FC = () => {
   const { topicId } = useParams<{ topicId: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const validTopicId: TopicId = (topicId as TopicId) || 'input-output';
   const topicMeta = getTopicMeta(validTopicId);
 
-  const [activeTab, setActiveTab] = useState<ArenaTab>('learn');
+  const requestedTab = searchParams.get('tab');
+  const [activeTab, setActiveTab] = useState<ArenaTab>(
+    requestedTab === 'code' || requestedTab === 'mcq' || requestedTab === 'learn'
+      ? requestedTab
+      : 'learn',
+  );
   const [, setTick] = useState(0); // force re-render on progress update
 
   // Data for current topic

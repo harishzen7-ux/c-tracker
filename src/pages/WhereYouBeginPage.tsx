@@ -261,7 +261,7 @@ export const WhereYouBeginPage: React.FC<WhereYouBeginPageProps> = ({
           <ul className="grid gap-3 sm:grid-cols-2">
             {prerequisites.map((item) => (
               <li key={item} className="flex items-start gap-3 text-sm leading-relaxed text-[var(--neu-text-secondary)]">
-                <CheckCircle2 size={18} className="mt-0.5 shrink-0 text-[var(--neu-green)]" aria-hidden="true" />
+                <CheckCircle2 size={18} className="mt-0.5 shrink-0 text-[var(--neu-green-tile-text)]" aria-hidden="true" />
                 <span>{item}</span>
               </li>
             ))}

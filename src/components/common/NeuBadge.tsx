@@ -25,8 +25,8 @@ export const NeuBadge: React.FC<NeuBadgeProps> = ({
       dotColor: 'bg-[var(--neu-accent)] shadow-[0_0_6px_var(--neu-accent)]',
     },
     green: {
-      text: 'text-emerald-700 dark:text-emerald-400 font-semibold',
-      dotColor: 'bg-emerald-600 dark:bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.8)]',
+      text: 'text-[var(--neu-green-tile-text)] font-semibold',
+      dotColor: 'bg-[#0BDA51] shadow-[0_0_6px_rgba(11,218,81,0.8)]',
     },
     red: {
       text: 'text-rose-700 dark:text-red-400 font-semibold',
@@ -37,8 +37,8 @@ export const NeuBadge: React.FC<NeuBadgeProps> = ({
       dotColor: 'bg-amber-600 dark:bg-amber-500 shadow-[0_0_6px_rgba(245,158,11,0.8)]',
     },
     easy: {
-      text: 'text-emerald-700 dark:text-emerald-400 font-semibold',
-      dotColor: 'bg-emerald-600 dark:bg-emerald-500',
+      text: 'text-[var(--neu-green-tile-text)] font-semibold',
+      dotColor: 'bg-[#0BDA51]',
     },
     medium: {
       text: 'text-amber-800 dark:text-amber-400 font-semibold',

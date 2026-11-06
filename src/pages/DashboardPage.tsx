@@ -137,7 +137,7 @@ export const DashboardPage: React.FC = () => {
               Foundational mastery across C standard I/O, operators, logic, and iteration loops.
             </p>
             <div className="mt-4 flex items-center gap-3">
-              <span className="text-xs font-mono text-emerald-600 dark:text-emerald-400 font-semibold">
+              <span className="text-xs font-mono text-[var(--neu-green-tile-text)] font-semibold">
                 {grandCompletedItems}/{grandTotalItems} Points Earned
               </span>
             </div>
@@ -198,7 +198,7 @@ export const DashboardPage: React.FC = () => {
 
         <Link
           to="/getting-started"
-          className="group relative flex flex-col items-center justify-between gap-6 overflow-hidden rounded-[24px] border border-[var(--neu-accent)]/30 bg-gradient-to-r from-[var(--neu-accent)]/8 via-[var(--neu-surface)] to-[var(--neu-accent)]/5 p-6 shadow-[0_12px_36px_rgba(0,0,0,0.12)] transition-all duration-300 hover:-translate-y-1 hover:border-[var(--neu-accent)]/50 hover:shadow-[0_18px_42px_var(--neu-accent-glow)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--neu-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--neu-base)] sm:flex-row sm:gap-8 sm:p-7"
+          className="group relative flex flex-col items-center justify-between gap-6 overflow-hidden rounded-[24px] border border-[var(--neu-accent)]/30 bg-gradient-to-r from-[var(--neu-accent)]/8 via-[var(--neu-surface)] to-[var(--neu-accent)]/5 p-6 shadow-[0_12px_36px_rgba(0,0,0,0.12)] transition-[border-color,box-shadow,transform] duration-300 hover:-translate-y-1 hover:border-[var(--neu-accent)]/50 hover:shadow-[0_18px_42px_var(--neu-accent-glow)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--neu-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--neu-base)] sm:flex-row sm:gap-8 sm:p-7"
         >
           <span className="pointer-events-none absolute -right-10 -top-16 h-48 w-48 rounded-full bg-[var(--neu-accent)]/5 blur-3xl transition-colors duration-300 group-hover:bg-[var(--neu-accent)]/10" />
           <span className="relative flex-1 text-center sm:text-left">

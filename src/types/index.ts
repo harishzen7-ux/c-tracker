@@ -4,6 +4,15 @@ export type Difficulty = 'easy' | 'medium' | 'hard';
 
 export type TopicStatus = 'not_started' | 'in_progress' | 'mastered';
 
+export type LearningStage = 'understand' | 'learn' | 'explore' | 'practice' | 'check' | 'master';
+
+export interface ConceptLearningProgress {
+  completedStages: Partial<Record<LearningStage, boolean>>;
+  currentStage: LearningStage;
+  bestCheckScore: number;
+  mastered: boolean;
+}
+
 export interface LessonSection {
   id: string;
   title: string;
@@ -160,6 +169,7 @@ export interface UserProgress {
   themePreferenceVersion: number;
   theme: 'dark' | 'light';
   timerEnabled: boolean;
+  learningArena: Record<string, ConceptLearningProgress>;
 }
 
 export interface ExecutionResult {

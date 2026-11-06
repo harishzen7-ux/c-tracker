@@ -44,7 +44,7 @@ export const NeuIconButton: React.FC<NeuIconButtonProps> = ({
       aria-label={ariaLabel}
       title={ariaLabel}
       disabled={disabled}
-      className={`inline-flex items-center justify-center transition-all duration-150 outline-none focus-visible:ring-2 focus-visible:ring-[var(--neu-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--neu-base)] ${shapeClass} ${sizeClass} ${variantStyle} ${glowStyle} ${disabledStyle} ${className}`}
+      className={`inline-flex items-center justify-center transition-[color,background-color,box-shadow,transform,filter] duration-150 outline-none focus-visible:ring-2 focus-visible:ring-[var(--neu-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--neu-base)] ${shapeClass} ${sizeClass} ${variantStyle} ${glowStyle} ${disabledStyle} ${className}`}
       {...rest}
     >
       {children}

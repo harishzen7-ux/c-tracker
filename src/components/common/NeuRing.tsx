@@ -26,13 +26,13 @@ export const NeuRing: React.FC<NeuRingProps> = ({
 
   const strokeColor = {
     orange: 'url(#orangeRingGrad)',
-    green: '#22c55e',
+    green: '#0BDA51',
     red: '#ef4444',
   }[color];
 
   const glowShadow = {
     orange: 'drop-shadow(0 0 6px var(--neu-accent-glow))',
-    green: 'drop-shadow(0 0 6px rgba(34,197,94,0.5))',
+    green: 'drop-shadow(0 0 6px rgba(11,218,81,0.5))',
     red: 'drop-shadow(0 0 6px rgba(239,68,68,0.5))',
   }[color];
 
@@ -80,7 +80,7 @@ export const NeuRing: React.FC<NeuRingProps> = ({
           strokeDashoffset={strokeDashoffset}
           strokeLinecap="round"
           fill="none"
-          className="transition-all duration-700 ease-out"
+          className="transition-[stroke-dashoffset,stroke] duration-700 ease-out"
         />
       </svg>
 

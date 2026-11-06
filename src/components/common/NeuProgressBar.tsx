@@ -27,7 +27,7 @@ export const NeuProgressBar: React.FC<NeuProgressBarProps> = ({
 
   const colorGradients = {
     orange: 'from-[var(--neu-accent)] to-[var(--neu-accent-light)] shadow-[0_0_8px_var(--neu-accent-glow)]',
-    green: 'from-emerald-500 to-teal-400 shadow-[0_0_8px_rgba(16,185,129,0.4)]',
+    green: 'from-[#0BDA51] to-[#0BDA51] shadow-[0_0_8px_rgba(11,218,81,0.4)]',
     blue: 'from-sky-500 to-indigo-400 shadow-[0_0_8px_rgba(14,165,233,0.4)]',
   }[color];
 
@@ -45,7 +45,7 @@ export const NeuProgressBar: React.FC<NeuProgressBarProps> = ({
       )}
       <div className={`w-full ${heightClasses} rounded-full neu-inset overflow-hidden p-0.5`}>
         <div
-          className={`h-full rounded-full bg-gradient-to-r ${colorGradients} transition-all duration-300`}
+          className={`h-full rounded-full bg-gradient-to-r ${colorGradients} transition-[width,background-color] duration-300`}
           style={{ width: `${clamped}%` }}
         />
       </div>

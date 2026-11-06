@@ -62,7 +62,7 @@ export function NeuDropdown<T extends string = string>({
         aria-haspopup="true"
         aria-expanded={isOpen}
         aria-controls={menuId}
-        className="inline-flex min-h-10 items-center justify-between gap-3 rounded-full neu-raised px-4 py-2 text-xs font-medium text-[var(--neu-text-primary)] transition-all duration-150 hover:text-[var(--neu-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--neu-accent)] active:neu-inset cursor-pointer sm:text-sm"
+        className="inline-flex min-h-10 items-center justify-between gap-3 rounded-full neu-raised px-4 py-2 text-xs font-medium text-[var(--neu-text-primary)] transition-[color,background-color,box-shadow,transform] duration-150 hover:text-[var(--neu-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--neu-accent)] active:neu-inset cursor-pointer sm:text-sm"
       >
         <span className="flex items-center gap-2">
           {labelPrefix && <span className="text-[var(--neu-text-muted)]">{labelPrefix}</span>}
@@ -81,7 +81,7 @@ export function NeuDropdown<T extends string = string>({
         <div
           id={menuId}
           aria-labelledby={triggerId}
-          className="absolute right-0 z-50 mt-2 max-h-[min(60vh,20rem)] w-max min-w-[12rem] max-w-[calc(100vw-2rem)] overflow-y-auto rounded-2xl border border-[var(--neu-border)] bg-[var(--neu-surface)] py-1.5 shadow-[0_12px_32px_rgba(15,20,28,0.18)] neu-raised-lg animate-in fade-in zoom-in-95 duration-150"
+          className="absolute right-0 z-50 mt-2 max-h-[min(60vh,20rem)] w-max min-w-[12rem] max-w-[calc(100vw-2rem)] overflow-y-auto rounded-2xl border border-[var(--neu-border)] bg-[var(--neu-surface)] py-1.5 shadow-[0_12px_32px_rgba(15,20,28,0.18)] neu-raised-lg"
         >
           {options.map((opt) => {
             const isSel = opt.id === selectedId;

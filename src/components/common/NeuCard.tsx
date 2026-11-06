@@ -38,7 +38,7 @@ export const NeuCard: React.FC<NeuCardProps> = ({
 
   return (
     <div
-      className={`relative p-5 transition-all duration-200 ${radiusClasses} ${variantClasses} ${hoverClass} ${glowClass} ${className}`}
+      className={`relative p-5 transition-[background-color,box-shadow,transform,border-color,color] duration-200 ${radiusClasses} ${variantClasses} ${hoverClass} ${glowClass} ${className}`}
       {...rest}
     >
       {active && (

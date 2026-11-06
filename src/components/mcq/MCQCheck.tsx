@@ -145,7 +145,7 @@ export const MCQCheck: React.FC<MCQCheckProps> = ({ mcqs, topicId, onScoreSaved 
           particleCount: 80,
           spread: 70,
           origin: { y: 0.6 },
-          colors: [accent, accentLight, '#22c55e', '#ffffff'],
+          colors: [accent, accentLight, '#0BDA51', '#ffffff'],
         });
       } catch (e) {
         // confetti safe
@@ -270,7 +270,7 @@ export const MCQCheck: React.FC<MCQCheckProps> = ({ mcqs, topicId, onScoreSaved 
 
       {/* RESULTS SCREEN (Rendered if submitted) */}
       {isSubmitted && scoreResults && (
-        <NeuCard className="p-6 sm:p-8 flex flex-col gap-8 animate-in fade-in duration-300">
+        <NeuCard className="p-6 sm:p-8 flex flex-col gap-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-8 pb-6 border-b border-[var(--neu-border)]">
             <div className="text-center md:text-left">
               <span className="text-xs font-mono uppercase tracking-widest text-[var(--neu-accent)] font-semibold">
@@ -331,7 +331,7 @@ export const MCQCheck: React.FC<MCQCheckProps> = ({ mcqs, topicId, onScoreSaved 
                     </ul>
                   </>
                 ) : (
-                  <div className="flex items-center gap-2 text-xs font-semibold text-emerald-400">
+                  <div className="flex items-center gap-2 text-xs font-semibold text-[var(--neu-green-tile-text)]">
                     <CheckCircle2 size={15} />
                     <span>Flawless run! All subtopics demonstrated mastery.</span>
                   </div>
@@ -410,13 +410,13 @@ export const MCQCheck: React.FC<MCQCheckProps> = ({ mcqs, topicId, onScoreSaved 
                 <div
                   key={optIdx}
                   onClick={() => handleSelectOption(optIdx)}
-                  className={`p-4 rounded-xl transition-all duration-150 flex items-center justify-between cursor-pointer ${
+                  className={`p-4 rounded-xl transition-[color,background-color,box-shadow,transform] duration-150 flex items-center justify-between cursor-pointer ${
                     isChecked
                       ? 'neu-inset border border-[var(--neu-accent)]/40 shadow-[0_0_8px_var(--neu-accent-glow)]'
                       : 'neu-raised hover:neu-raised-hover'
                   } ${
                     isSubmitted && optIdx === currentQ.correctIndex
-                      ? 'border border-emerald-500/60 bg-emerald-500/10 dark:bg-emerald-500/5'
+                      ? 'border border-[#0BDA51]/60 bg-[#0BDA51]/10'
                       : isSubmitted && isChecked && optIdx !== currentQ.correctIndex
                       ? 'border border-rose-500/60 bg-rose-500/10 dark:bg-rose-500/5'
                       : ''
@@ -434,7 +434,7 @@ export const MCQCheck: React.FC<MCQCheckProps> = ({ mcqs, topicId, onScoreSaved 
                         </span>
                         <span className={`font-mono text-xs sm:text-sm ${
                           isSubmitted && optIdx === currentQ.correctIndex
-                            ? 'text-emerald-700 dark:text-emerald-300 font-semibold'
+                            ? 'text-[var(--neu-green-tile-text)] font-semibold'
                             : isSubmitted && isChecked && optIdx !== currentQ.correctIndex
                             ? 'text-rose-700 dark:text-rose-300'
                             : 'text-[var(--neu-text-primary)]'
@@ -446,7 +446,7 @@ export const MCQCheck: React.FC<MCQCheckProps> = ({ mcqs, topicId, onScoreSaved 
                   />
 
                   {isSubmitted && optIdx === currentQ.correctIndex && (
-                    <CheckCircle2 size={16} className="text-emerald-600 dark:text-emerald-400 shrink-0 ml-2" />
+                    <CheckCircle2 size={16} className="text-[var(--neu-green-tile-text)] shrink-0 ml-2" />
                   )}
                   {isSubmitted && isChecked && optIdx !== currentQ.correctIndex && (
                     <XCircle size={16} className="text-rose-600 dark:text-rose-400 shrink-0 ml-2" />
@@ -458,7 +458,7 @@ export const MCQCheck: React.FC<MCQCheckProps> = ({ mcqs, topicId, onScoreSaved 
 
         {/* Review Mode: Detailed Explanation Callout */}
         {isSubmitted && (
-          <div className="p-5 rounded-2xl bg-[var(--neu-surface)] border border-[var(--neu-accent)]/30 neu-raised flex flex-col gap-2 animate-in fade-in duration-200">
+          <div className="p-5 rounded-2xl bg-[var(--neu-surface)] border border-[var(--neu-accent)]/30 neu-raised flex flex-col gap-2">
             <div className="flex items-center gap-2 text-xs font-bold font-mono text-[var(--neu-accent)]">
               <Lightbulb size={16} />
               <span>Correct Answer: Option {String.fromCharCode(65 + currentQ.correctIndex)}</span>
@@ -539,7 +539,7 @@ export const MCQCheck: React.FC<MCQCheckProps> = ({ mcqs, topicId, onScoreSaved 
             if (isSubmitted) {
               const isCorrect = selectedAnswers[idx] === q.correctIndex;
               paletteStyle = isCorrect
-                ? 'bg-emerald-500/20 text-emerald-800 dark:text-emerald-400 font-bold border border-emerald-500/40 shadow-[0_0_6px_rgba(34,197,94,0.4)]'
+                ? 'bg-[#0BDA51]/20 text-[var(--neu-green-tile-text)] font-bold border border-[#0BDA51]/40 shadow-[0_0_6px_rgba(11,218,81,0.4)]'
                 : 'bg-red-500/20 text-rose-800 dark:text-rose-400 font-bold border border-red-500/40';
             } else if (isCur) {
               paletteStyle = 'neu-inset text-[var(--neu-accent)] border border-[var(--neu-accent)]/80 shadow-[0_0_8px_var(--neu-accent-glow)] font-bold';
@@ -553,7 +553,7 @@ export const MCQCheck: React.FC<MCQCheckProps> = ({ mcqs, topicId, onScoreSaved 
               <button
                 key={q.id}
                 onClick={() => setCurrentIndex(idx)}
-                className={`h-8 rounded-lg text-xs font-mono font-semibold transition-all duration-150 flex items-center justify-center cursor-pointer ${paletteStyle}`}
+                className={`h-8 rounded-lg text-xs font-mono font-semibold transition-[color,background-color,box-shadow,transform] duration-150 flex items-center justify-center cursor-pointer ${paletteStyle}`}
                 title={`Question ${idx + 1}`}
               >
                 {idx + 1}

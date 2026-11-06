@@ -23,8 +23,8 @@ export const NeuRadio: React.FC<NeuRadioProps> = ({
   let glowStyle = '';
 
   if (feedback === 'correct') {
-    indicatorStyle = 'bg-emerald-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]';
-    glowStyle = 'border-emerald-500/50 shadow-[inset_2px_2px_5px_rgba(0,0,0,0.6),0_0_8px_rgba(34,197,94,0.4)]';
+    indicatorStyle = 'bg-[#0BDA51] shadow-[0_0_8px_rgba(11,218,81,0.6)]';
+    glowStyle = 'border-[#0BDA51]/50 shadow-[inset_2px_2px_5px_rgba(0,0,0,0.6),0_0_8px_rgba(11,218,81,0.4)]';
   } else if (feedback === 'wrong') {
     indicatorStyle = 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]';
     glowStyle = 'border-red-500/50 shadow-[inset_2px_2px_5px_rgba(0,0,0,0.6),0_0_8px_rgba(239,68,68,0.4)]';
@@ -49,10 +49,10 @@ export const NeuRadio: React.FC<NeuRadioProps> = ({
           disabled={disabled}
         />
         <div
-          className={`w-5.5 h-5.5 rounded-full flex items-center justify-center neu-inset transition-all duration-150 border border-transparent ${glowStyle}`}
+          className={`w-5.5 h-5.5 rounded-full flex items-center justify-center neu-inset transition-[color,background-color,box-shadow,transform] duration-150 border border-transparent ${glowStyle}`}
         >
           {checked && (
-            <div className={`w-2.5 h-2.5 rounded-full transition-all duration-150 ${indicatorStyle}`} />
+            <div className={`w-2.5 h-2.5 rounded-full transition-[background-color,transform,opacity] duration-150 ${indicatorStyle}`} />
           )}
         </div>
       </div>

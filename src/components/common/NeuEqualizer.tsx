@@ -25,7 +25,7 @@ export const NeuEqualizer: React.FC<NeuEqualizerProps> = ({
         const clamped = Math.min(100, Math.max(0, item.value));
         const barColor =
           item.color === 'green'
-            ? 'from-emerald-500 to-teal-400'
+            ? 'from-[#0BDA51] to-[#0BDA51]'
             : item.color === 'amber'
             ? 'from-amber-500 to-orange-400'
             : 'from-[var(--neu-accent)] to-[var(--neu-accent-light)]';
@@ -42,7 +42,7 @@ export const NeuEqualizer: React.FC<NeuEqualizerProps> = ({
               style={{ height }}
             >
               <div
-                className={`w-full rounded-full bg-gradient-to-t ${barColor} shadow-[0_0_8px_var(--neu-accent-glow)] transition-all duration-500 ease-out`}
+                className={`w-full rounded-full bg-gradient-to-t ${barColor} shadow-[0_0_8px_var(--neu-accent-glow)] transition-[height,background-color,box-shadow] duration-500 ease-out`}
                 style={{ height: `${clamped}%` }}
               />
             </div>

@@ -26,6 +26,7 @@ const defaultProgress: UserProgress = {
   themePreferenceVersion: THEME_PREFERENCE_VERSION,
   theme: 'light',
   timerEnabled: false,
+  learningArena: {},
 };
 
 function createDefaultProgress(): UserProgress {
@@ -36,6 +37,7 @@ function createDefaultProgress(): UserProgress {
     mcqBestScores: {},
     solvedProblems: {},
     savedCode: {},
+    learningArena: {},
     streak: { ...defaultProgress.streak },
   };
 }
@@ -67,6 +69,7 @@ function normalizeProgress(parsed: Partial<UserProgress>): UserProgress {
     mcqBestScores: { ...parsed.mcqBestScores },
     solvedProblems: { ...parsed.solvedProblems },
     savedCode: { ...parsed.savedCode },
+    learningArena: { ...parsed.learningArena },
     theme: hasSavedThemePreference ? parsed.theme ?? defaultProgress.theme : 'light',
     streak: isLegacyStreak
       ? createDefaultProgress().streak
@@ -103,6 +106,7 @@ function progressPayload(progress: UserProgress) {
     theme: progress.theme,
     themePreferenceVersion: progress.themePreferenceVersion,
     timerEnabled: progress.timerEnabled,
+    learningArena: progress.learningArena,
     streak: progress.streak,
     loginStreakVersion: progress.loginStreakVersion,
   };
@@ -239,6 +243,28 @@ export const storageService = {
   isLessonCompleted(topicId: string, sectionId: string): boolean {
     const progress = this.getProgress();
     return !!progress.completedLessons[`${topicId}:${sectionId}`];
+  },
+
+  getConceptLearningProgress(topicId: string, sectionId: string) {
+    const progress = this.getProgress();
+    return progress.learningArena[`${topicId}:${sectionId}`] ?? {
+      completedStages: {},
+      currentStage: 'understand' as const,
+      bestCheckScore: 0,
+      mastered: false,
+    };
+  },
+
+  saveConceptLearningProgress(
+    topicId: string,
+    sectionId: string,
+    conceptProgress: UserProgress['learningArena'][string],
+  ): void {
+    const progress = this.getProgress();
+    progress.learningArena[`${topicId}:${sectionId}`] = conceptProgress;
+    inMemoryProgress = progress;
+    void this.syncToSupabase(progress, true);
+    notifyListeners();
   },
 
   toggleLessonCompleted(topicId: string, sectionId: string): boolean {

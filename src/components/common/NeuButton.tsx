@@ -44,7 +44,7 @@ export const NeuButton: React.FC<NeuButtonProps> = ({
 
   return (
     <button
-      className={`inline-flex items-center justify-center font-medium transition-all duration-150 select-none whitespace-nowrap outline-none focus-visible:ring-2 focus-visible:ring-[var(--neu-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--neu-base)] ${sizeClasses} ${variantClasses} ${disabledClass} ${fullWidth ? 'w-full' : ''} ${className}`}
+      className={`inline-flex items-center justify-center font-medium transition-[color,background-color,box-shadow,transform,filter] duration-150 select-none whitespace-nowrap outline-none focus-visible:ring-2 focus-visible:ring-[var(--neu-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--neu-base)] ${sizeClasses} ${variantClasses} ${disabledClass} ${fullWidth ? 'w-full' : ''} ${className}`}
       disabled={disabled}
       {...rest}
     >

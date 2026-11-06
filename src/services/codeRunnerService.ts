@@ -174,6 +174,7 @@ export const codeRunnerService = {
     let output = '';
     const inputTokens = stdin.trim().split(/\s+/).filter(Boolean);
     let tokenIndex = 0;
+    let characterIndex = 0;
 
     // Helper functions passed into the simulated environment
     const __printf = (format: string, ...args: any[]) => {
@@ -239,14 +240,17 @@ export const codeRunnerService = {
 
     const __getchar = () => {
       const allInput = stdin;
-      if (tokenIndex < allInput.length) {
-        return allInput.charCodeAt(tokenIndex++);
+      if (characterIndex < allInput.length) {
+        return allInput.charCodeAt(characterIndex++);
       }
       return -1; // EOF
     };
 
-    const __scanfNextToken = () => {
-      return inputTokens[tokenIndex++] || '0';
+    const __scanfNextToken = (format = '%d') => {
+      const token = inputTokens[tokenIndex++] || '';
+      if (format.includes('c')) return token[0] || '\0';
+      if (format.includes('s')) return token;
+      return Number(token || 0);
     };
 
     try {
@@ -289,9 +293,11 @@ export const codeRunnerService = {
       // Transform scanf("%d", &n) -> n = Number(__scanfNextToken())
       jsBody = jsBody.replace(/scanf\s*\(\s*"([^"]+)"\s*,([\s\S]*?)\);/g, (_m, format, varsStr) => {
         const vars = varsStr.split(',').map((v: string) => v.replace('&', '').trim()).filter(Boolean);
+        const formats = format.match(/%[cdisf]/g) || [];
         let assignments = '';
         for (const v of vars) {
-          assignments += `${v} = Number(__scanfNextToken());\n`;
+          const valueFormat = formats.shift() || '%d';
+          assignments += `${v} = __scanfNextToken(${JSON.stringify(valueFormat)});\n`;
         }
         return assignments;
       });

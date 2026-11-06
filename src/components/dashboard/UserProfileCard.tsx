@@ -33,7 +33,7 @@ export const UserProfileCard: React.FC<UserProfileCardProps> = ({
             </span>
           </div>
           <span
-            className="absolute bottom-0 right-0 h-4 w-4 rounded-full border-[3px] border-[var(--neu-surface)] bg-emerald-500 shadow-[0_0_8px_rgba(34,197,94,0.7)]"
+            className="absolute bottom-0 right-0 h-4 w-4 rounded-full border-[3px] border-[var(--neu-surface)] bg-[#0BDA51] shadow-[0_0_8px_rgba(11,218,81,0.7)]"
             title="Online"
           />
         </div>
@@ -55,7 +55,7 @@ export const UserProfileCard: React.FC<UserProfileCardProps> = ({
           {/* Quick stats unboxed */}
           <div className="flex items-center justify-center sm:justify-start gap-4 mt-3 text-xs text-[var(--neu-text-muted)] font-mono">
             <span className="text-[var(--neu-text-primary)] font-semibold">
-              <span className="text-emerald-500 font-bold">{totalSolved}</span> Challenges Solved
+              <span className="text-[var(--neu-green-tile-text)] font-bold">{totalSolved}</span> Challenges Solved
             </span>
             <span aria-hidden="true">·</span>
             <span className="text-[var(--neu-text-primary)] font-semibold">

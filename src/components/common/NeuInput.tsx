@@ -24,7 +24,7 @@ export const NeuInput: React.FC<NeuInputProps> = ({
         </div>
       )}
       <input
-        className={`w-full py-2.5 bg-[var(--neu-base)] text-[var(--neu-text-primary)] placeholder-[var(--neu-text-muted)] text-sm neu-inset outline-none transition-all duration-200 border border-transparent focus:border-[var(--neu-accent)]/50 focus:shadow-[inset_2px_2px_6px_var(--neu-shadow-dark),0_0_10px_var(--neu-accent-glow)] ${
+        className={`w-full py-2.5 bg-[var(--neu-base)] text-[var(--neu-text-primary)] placeholder-[var(--neu-text-muted)] text-sm neu-inset outline-none transition-[color,background-color,border-color,box-shadow] duration-200 border border-transparent focus:border-[var(--neu-accent)]/50 focus:shadow-[inset_2px_2px_6px_var(--neu-shadow-dark),0_0_10px_var(--neu-accent-glow)] ${
           icon && iconPosition === 'left' ? 'pl-11' : 'pl-5'
         } ${icon && iconPosition === 'right' ? 'pr-11' : 'pr-5'} ${shapeClass} ${className}`}
         disabled={disabled}

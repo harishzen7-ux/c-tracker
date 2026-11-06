@@ -38,7 +38,7 @@ export const NeuSlider: React.FC<NeuSliderProps> = ({
         <div className="w-full h-2 rounded-full neu-inset relative overflow-hidden">
           {/* Filled orange progress */}
           <div
-            className="h-full bg-gradient-to-r from-[var(--neu-accent)] to-[var(--neu-accent-light)] shadow-[0_0_8px_var(--neu-accent-glow)] rounded-full transition-all duration-75"
+            className="h-full bg-gradient-to-r from-[var(--neu-accent)] to-[var(--neu-accent-light)] shadow-[0_0_8px_var(--neu-accent-glow)] rounded-full transition-[width,background-color,box-shadow] duration-75"
             style={{ width: `${percentage}%` }}
           />
         </div>
@@ -54,7 +54,7 @@ export const NeuSlider: React.FC<NeuSliderProps> = ({
         />
         {/* Raised Knob */}
         <div
-          className="absolute w-4.5 h-4.5 rounded-full bg-[var(--neu-surface)] shadow-[2px_2px_5px_rgba(0,0,0,0.6),-1px_-1px_3px_rgba(255,255,255,0.1)] border border-[var(--neu-accent)]/40 pointer-events-none -translate-x-1/2 flex items-center justify-center transition-all duration-75"
+          className="absolute w-4.5 h-4.5 rounded-full bg-[var(--neu-surface)] shadow-[2px_2px_5px_rgba(0,0,0,0.6),-1px_-1px_3px_rgba(255,255,255,0.1)] border border-[var(--neu-accent)]/40 pointer-events-none -translate-x-1/2 flex items-center justify-center transition-[left,background-color,box-shadow] duration-75"
           style={{ left: `${percentage}%` }}
         >
           <div className="w-1.5 h-1.5 rounded-full bg-[var(--neu-accent)]" />

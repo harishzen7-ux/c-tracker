@@ -145,7 +145,7 @@ export const SignupPage: React.FC = () => {
                 {isCheckingUsername ? (
                   <span className="text-[11px] text-[var(--neu-text-muted)]">Checking...</span>
                 ) : usernameAvailable === true ? (
-                  <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold">
+                  <span className="text-[11px] text-[var(--neu-green-tile-text)] font-semibold">
                     ✓ Available
                   </span>
                 ) : usernameError ? (
@@ -200,34 +200,34 @@ export const SignupPage: React.FC = () => {
               {password.length > 0 && (
                 <div className="p-3 rounded-xl neu-inset bg-black/10 dark:bg-black/25 flex flex-col gap-1.5 text-[11px] font-mono mt-1">
                   <div className="flex items-center gap-2">
-                    <span className={passwordRules.hasLength ? 'text-emerald-500 font-bold' : 'text-[var(--neu-text-muted)]'}>
+                    <span className={passwordRules.hasLength ? 'text-[var(--neu-green-tile-text)] font-bold' : 'text-[var(--neu-text-muted)]'}>
                       {passwordRules.hasLength ? '✓' : '•'}
                     </span>
-                    <span className={passwordRules.hasLength ? 'text-emerald-700 dark:text-emerald-400 font-medium' : 'text-[var(--neu-text-muted)]'}>
+                    <span className={passwordRules.hasLength ? 'text-[var(--neu-green-tile-text)] font-medium' : 'text-[var(--neu-text-muted)]'}>
                       8 to 64 characters
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className={passwordRules.hasLetter ? 'text-emerald-500 font-bold' : 'text-[var(--neu-text-muted)]'}>
+                    <span className={passwordRules.hasLetter ? 'text-[var(--neu-green-tile-text)] font-bold' : 'text-[var(--neu-text-muted)]'}>
                       {passwordRules.hasLetter ? '✓' : '•'}
                     </span>
-                    <span className={passwordRules.hasLetter ? 'text-emerald-700 dark:text-emerald-400 font-medium' : 'text-[var(--neu-text-muted)]'}>
+                    <span className={passwordRules.hasLetter ? 'text-[var(--neu-green-tile-text)] font-medium' : 'text-[var(--neu-text-muted)]'}>
                       At least 1 letter
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className={passwordRules.hasNumber ? 'text-emerald-500 font-bold' : 'text-[var(--neu-text-muted)]'}>
+                    <span className={passwordRules.hasNumber ? 'text-[var(--neu-green-tile-text)] font-bold' : 'text-[var(--neu-text-muted)]'}>
                       {passwordRules.hasNumber ? '✓' : '•'}
                     </span>
-                    <span className={passwordRules.hasNumber ? 'text-emerald-700 dark:text-emerald-400 font-medium' : 'text-[var(--neu-text-muted)]'}>
+                    <span className={passwordRules.hasNumber ? 'text-[var(--neu-green-tile-text)] font-medium' : 'text-[var(--neu-text-muted)]'}>
                       At least 1 number
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className={passwordRules.noSpaces && passwordRules.notUsername ? 'text-emerald-500 font-bold' : 'text-[var(--neu-text-muted)]'}>
+                    <span className={passwordRules.noSpaces && passwordRules.notUsername ? 'text-[var(--neu-green-tile-text)] font-bold' : 'text-[var(--neu-text-muted)]'}>
                       {passwordRules.noSpaces && passwordRules.notUsername ? '✓' : '•'}
                     </span>
-                    <span className={passwordRules.noSpaces && passwordRules.notUsername ? 'text-emerald-700 dark:text-emerald-400 font-medium' : 'text-[var(--neu-text-muted)]'}>
+                    <span className={passwordRules.noSpaces && passwordRules.notUsername ? 'text-[var(--neu-green-tile-text)] font-medium' : 'text-[var(--neu-text-muted)]'}>
                       No spaces & not equal to username
                     </span>
                   </div>
