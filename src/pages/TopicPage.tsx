@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { lazy, Suspense, useState } from 'react';
 import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { TopicId } from '../types';
 import {
@@ -10,12 +10,19 @@ import {
 } from '../data';
 import { NeuSegmented, SegmentOption } from '../components/common/NeuSegmented';
 import { NeuDropdown } from '../components/common/NeuDropdown';
-import { LearningArena } from '../components/learn/LearningArena';
-import { MCQCheck } from '../components/mcq/MCQCheck';
-import { CodingArena } from '../components/code/CodingArena';
 import { storageService } from '../services/storageService';
 
 type ArenaTab = 'learn' | 'mcq' | 'code';
+
+const LearningArena = lazy(() =>
+  import('../components/learn/LearningArena').then((module) => ({ default: module.LearningArena })),
+);
+const MCQCheck = lazy(() =>
+  import('../components/mcq/MCQCheck').then((module) => ({ default: module.MCQCheck })),
+);
+const CodingArena = lazy(() =>
+  import('../components/code/CodingArena').then((module) => ({ default: module.CodingArena })),
+);
 
 export const TopicPage: React.FC = () => {
   const { topicId } = useParams<{ topicId: string }>();
@@ -129,29 +136,37 @@ export const TopicPage: React.FC = () => {
 
       {/* Main Tab View */}
       <div className="min-h-[500px]">
-        {activeTab === 'learn' && lesson && (
-          <LearningArena
-            lesson={lesson}
-            topicId={validTopicId}
-            onProgressUpdate={handleProgressUpdate}
-          />
-        )}
+        <Suspense
+          fallback={
+            <div className="flex min-h-[500px] items-center justify-center text-sm text-[var(--neu-text-muted)]">
+              Loading arena...
+            </div>
+          }
+        >
+          {activeTab === 'learn' && lesson && (
+            <LearningArena
+              lesson={lesson}
+              topicId={validTopicId}
+              onProgressUpdate={handleProgressUpdate}
+            />
+          )}
 
-        {activeTab === 'mcq' && (
-          <MCQCheck
-            mcqs={mcqs}
-            topicId={validTopicId}
-            onScoreSaved={handleProgressUpdate}
-          />
-        )}
+          {activeTab === 'mcq' && (
+            <MCQCheck
+              mcqs={mcqs}
+              topicId={validTopicId}
+              onScoreSaved={handleProgressUpdate}
+            />
+          )}
 
-        {activeTab === 'code' && (
-          <CodingArena
-            questions={codingQuestions}
-            topicId={validTopicId}
-            onProblemSolved={handleProgressUpdate}
-          />
-        )}
+          {activeTab === 'code' && (
+            <CodingArena
+              questions={codingQuestions}
+              topicId={validTopicId}
+              onProblemSolved={handleProgressUpdate}
+            />
+          )}
+        </Suspense>
       </div>
     </div>
   );

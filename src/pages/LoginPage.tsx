@@ -6,6 +6,12 @@ import { authService } from '../services/authService';
 import { useAuth } from '../services/AuthContext';
 import { ContactCredit } from '../components/layout/ContactCredit';
 
+interface LoginLocationState {
+  from?: {
+    pathname?: string;
+  };
+}
+
 export const LoginPage: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -60,7 +66,8 @@ export const LoginPage: React.FC = () => {
     setIsSubmitting(true);
     try {
       await login(username.trim(), password);
-      const destination = (location.state as any)?.from?.pathname || '/dashboard';
+      const locationState = location.state as LoginLocationState | null;
+      const destination = locationState?.from?.pathname || '/dashboard';
       navigate(destination, { replace: true });
     } catch (err: any) {
       const rem = authService.getRemainingLockout(username.trim());

@@ -555,7 +555,7 @@ export const LearningArena: React.FC<LearningArenaProps> = ({
                 title={!available ? `Complete ${stages[index - 1].label} first` : undefined}
                 className={`flex shrink-0 items-center gap-2 rounded-full px-3 py-2 text-xs font-semibold transition-[color,background-color,box-shadow,transform] ${
                   activeStage === stage.id ? 'neu-inset text-[var(--neu-accent)]' : stageComplete ? 'text-[var(--neu-green-tile-text)]' : 'text-[var(--neu-text-muted)] hover:text-[var(--neu-text-primary)]'
-                } ${!available ? 'cursor-not-allowed opacity-45' : ''}`}
+                } ${!available ? 'cursor-not-allowed opacity-45 dark:text-slate-300 dark:opacity-80' : ''}`}
               >
                 <StageIcon stage={stage.id} complete={stageComplete} locked={!available} />
                 {stage.label}
@@ -589,16 +589,16 @@ export const LearningArena: React.FC<LearningArenaProps> = ({
                     onClick={() => openConcept(index)}
                     className={`flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-left transition-[color,background-color,box-shadow,transform] ${
                       index === activeSectionIndex ? 'neu-inset text-[var(--neu-accent)]' : 'text-[var(--neu-text-secondary)] hover:text-[var(--neu-text-primary)]'
-                    } ${locked ? 'cursor-not-allowed opacity-45' : ''}`}
+                    } ${locked ? 'cursor-not-allowed opacity-45 dark:text-slate-300 dark:opacity-80' : ''}`}
                   >
                     <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${
-                      progress.mastered ? 'bg-[#0BDA51]/15 text-[var(--neu-green-tile-text)]' : locked ? 'bg-[var(--neu-base)] text-[var(--neu-text-muted)]' : 'bg-[var(--neu-accent)]/10 text-[var(--neu-accent)]'
+                      progress.mastered ? 'bg-[#0BDA51]/15 text-[var(--neu-green-tile-text)]' : locked ? 'bg-[var(--neu-base)] text-[var(--neu-text-muted)] dark:text-slate-300' : 'bg-[var(--neu-accent)]/10 text-[var(--neu-accent)]'
                     }`}>
                       {progress.mastered ? <Check size={14} /> : locked ? <LockKeyhole size={12} /> : String(index + 1).padStart(2, '0')}
                     </span>
                     <span className="min-w-0">
                       <span className="block truncate text-xs font-semibold">{section.title.replace(/^(Foundation|Core Concepts|Practice|Intermediate) · /, '')}</span>
-                      <span className="mt-0.5 block text-[10px] uppercase tracking-wide opacity-60">{progress.mastered ? 'Mastered' : locked ? 'Locked' : inProgress ? 'In progress' : 'Available'}</span>
+                      <span className={`mt-0.5 block text-[10px] uppercase tracking-wide ${locked ? 'opacity-75 dark:text-slate-300 dark:opacity-100' : 'opacity-60'}`}>{progress.mastered ? 'Mastered' : locked ? 'Locked' : inProgress ? 'In progress' : 'Available'}</span>
                     </span>
                   </button>
                 );
