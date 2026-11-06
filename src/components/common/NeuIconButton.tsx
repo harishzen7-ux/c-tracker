@@ -33,7 +33,7 @@ export const NeuIconButton: React.FC<NeuIconButtonProps> = ({
   if (variant === 'inset' || active) {
     variantStyle = 'neu-inset text-[var(--neu-accent)] shadow-[inset_2px_2px_5px_var(--neu-shadow-dark),inset_-2px_-2px_5px_var(--neu-shadow-light)]';
   } else if (variant === 'primary') {
-    variantStyle = 'neu-orange-gradient text-slate-950 font-bold shadow-[0_0_12px_var(--neu-accent-glow)] hover:brightness-105 active:scale-95';
+    variantStyle = 'neu-orange-gradient text-white dark:text-slate-950 font-bold shadow-[0_0_12px_var(--neu-accent-glow)] hover:brightness-105 active:scale-95';
   }
 
   const glowStyle = (glow || active) ? 'shadow-[0_0_12px_var(--neu-accent-glow)] border border-[var(--neu-accent)]/30' : '';

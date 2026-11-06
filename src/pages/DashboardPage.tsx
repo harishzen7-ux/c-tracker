@@ -198,7 +198,7 @@ export const DashboardPage: React.FC = () => {
 
         <Link
           to="/getting-started"
-          className="group relative flex flex-col items-center justify-between gap-6 overflow-hidden rounded-[24px] border border-[var(--neu-accent)]/30 bg-gradient-to-r from-[var(--neu-accent)]/8 via-[var(--neu-surface)] to-[var(--neu-accent)]/5 p-6 shadow-[0_12px_36px_rgba(0,0,0,0.12)] transition-all duration-300 hover:-translate-y-1 hover:border-[var(--neu-accent)]/50 hover:shadow-[0_18px_42px_rgba(255,122,26,0.2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--neu-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--neu-base)] sm:flex-row sm:gap-8 sm:p-7"
+          className="group relative flex flex-col items-center justify-between gap-6 overflow-hidden rounded-[24px] border border-[var(--neu-accent)]/30 bg-gradient-to-r from-[var(--neu-accent)]/8 via-[var(--neu-surface)] to-[var(--neu-accent)]/5 p-6 shadow-[0_12px_36px_rgba(0,0,0,0.12)] transition-all duration-300 hover:-translate-y-1 hover:border-[var(--neu-accent)]/50 hover:shadow-[0_18px_42px_var(--neu-accent-glow)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--neu-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--neu-base)] sm:flex-row sm:gap-8 sm:p-7"
         >
           <span className="pointer-events-none absolute -right-10 -top-16 h-48 w-48 rounded-full bg-[var(--neu-accent)]/5 blur-3xl transition-colors duration-300 group-hover:bg-[var(--neu-accent)]/10" />
           <span className="relative flex-1 text-center sm:text-left">
@@ -212,7 +212,7 @@ export const DashboardPage: React.FC = () => {
                 Get the essentials, explore what C can do, and find your first steps in the curriculum.
               </span>
           </span>
-          <span className="begin-cta relative inline-flex min-h-[54px] min-w-[210px] shrink-0 items-center justify-center gap-2 rounded-full px-8 text-sm font-bold shadow-[0_8px_24px_rgba(255,122,26,0.24)] transition-transform duration-200 group-hover:scale-[1.03] sm:min-h-[60px] sm:text-base">
+          <span className="begin-cta relative inline-flex min-h-[54px] min-w-[210px] shrink-0 items-center justify-center gap-2 rounded-full px-8 text-sm font-bold shadow-[0_8px_24px_var(--neu-accent-glow)] transition-transform duration-200 group-hover:scale-[1.03] sm:min-h-[60px] sm:text-base">
             <span>Where you begin</span>
             <span aria-hidden="true">→</span>
           </span>

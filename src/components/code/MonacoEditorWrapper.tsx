@@ -91,8 +91,8 @@ export const MonacoEditorWrapper: React.FC<MonacoEditorWrapperProps> = ({
         base: 'vs',
         inherit: true,
         rules: [
-          { token: 'keyword', foreground: 'd85200', fontStyle: 'bold' },
-          { token: 'type', foreground: '9a3412' },
+          { token: 'keyword', foreground: '0057D9', fontStyle: 'bold' },
+          { token: 'type', foreground: '1687FF' },
           { token: 'string', foreground: '15803d' },
           { token: 'number', foreground: '0284c7' },
           { token: 'comment', foreground: '64748b', fontStyle: 'italic' },
@@ -101,12 +101,12 @@ export const MonacoEditorWrapper: React.FC<MonacoEditorWrapperProps> = ({
         colors: {
           'editor.background': '#f8fafc',
           'editor.foreground': '#0f172a',
-          'editorCursor.foreground': '#d85200',
+          'editorCursor.foreground': '#0057D9',
           'editor.lineHighlightBackground': '#f1f5f9',
           'editorLineNumber.foreground': '#94a3b8',
-          'editorLineNumber.activeForeground': '#d85200',
-          'editor.selectionBackground': '#fed7aa',
-          'editor.inactiveSelectionBackground': '#ffedd5',
+          'editorLineNumber.activeForeground': '#0057D9',
+          'editor.selectionBackground': '#BFDBFE',
+          'editor.inactiveSelectionBackground': '#DBEAFE',
         },
       });
 

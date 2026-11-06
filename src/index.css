@@ -53,9 +53,9 @@
     --neu-surface-hover: #eff3fa;
     --neu-shadow-dark: rgba(160, 175, 195, 0.75);
     --neu-shadow-light: rgba(255, 255, 255, 0.95);
-    --neu-accent: #d85200; /* Deep high contrast amber-orange on light */
-    --neu-accent-light: #ea580c;
-    --neu-accent-glow: rgba(216, 82, 0, 0.35);
+    --neu-accent: #0057d9;
+    --neu-accent-light: #1687ff;
+    --neu-accent-glow: rgba(0, 87, 217, 0.35);
     --neu-text-primary: #0f141c; /* Deep rich near-black for 14:1 contrast */
     --neu-text-secondary: #333d4b; /* Crisp dark slate for 8:1 contrast */
     --neu-text-muted: #4e5969; /* Legible muted dark slate */
@@ -81,7 +81,7 @@
     --code-box-bg: #f5f7fa;
     --code-box-border: rgba(0, 0, 0, 0.12);
     --code-box-text: #0f172a;
-    --code-box-keyword: #c2410c;
+    --code-box-keyword: #0057d9;
     --code-box-string: #15803d;
     
     color: var(--neu-text-primary);
@@ -175,7 +175,11 @@
 }
 
 html.light .neu-orange-gradient {
-  background: linear-gradient(135deg, #e65c00 0%, #FF7A1A 100%);
+  background: linear-gradient(135deg, var(--neu-accent) 0%, var(--neu-accent-light) 100%);
+}
+
+html.light .begin-cta {
+  color: #fff;
 }
 
 @media (prefers-reduced-motion: reduce) {

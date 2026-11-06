@@ -135,11 +135,17 @@ export const MCQCheck: React.FC<MCQCheckProps> = ({ mcqs, topicId, onScoreSaved 
     // Trigger celebration if score >= 80%
     if ((correctCount / questions.length) >= 0.8) {
       try {
+        const accent = getComputedStyle(document.documentElement)
+          .getPropertyValue('--neu-accent')
+          .trim();
+        const accentLight = getComputedStyle(document.documentElement)
+          .getPropertyValue('--neu-accent-light')
+          .trim();
         confetti({
           particleCount: 80,
           spread: 70,
           origin: { y: 0.6 },
-          colors: ['#FF7A1A', '#FF9A45', '#22c55e', '#ffffff'],
+          colors: [accent, accentLight, '#22c55e', '#ffffff'],
         });
       } catch (e) {
         // confetti safe

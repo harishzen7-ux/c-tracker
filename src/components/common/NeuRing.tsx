@@ -31,7 +31,7 @@ export const NeuRing: React.FC<NeuRingProps> = ({
   }[color];
 
   const glowShadow = {
-    orange: 'drop-shadow(0 0 6px rgba(255,122,26,0.5))',
+    orange: 'drop-shadow(0 0 6px var(--neu-accent-glow))',
     green: 'drop-shadow(0 0 6px rgba(34,197,94,0.5))',
     red: 'drop-shadow(0 0 6px rgba(239,68,68,0.5))',
   }[color];
@@ -56,8 +56,8 @@ export const NeuRing: React.FC<NeuRingProps> = ({
       >
         <defs>
           <linearGradient id="orangeRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#FF9A45" />
-            <stop offset="100%" stopColor="#FF7A1A" />
+            <stop offset="0%" stopColor="var(--neu-accent-light)" />
+            <stop offset="100%" stopColor="var(--neu-accent)" />
           </linearGradient>
         </defs>
         {/* Track */}

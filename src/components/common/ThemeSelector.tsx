@@ -7,38 +7,34 @@ interface ThemeSelectorProps {
 }
 
 export const ThemeSelector: React.FC<ThemeSelectorProps> = ({ theme, onChange }) => (
-  <div
-    role="radiogroup"
-    aria-label="Color theme"
-    className="inline-flex items-center gap-1 rounded-xl neu-inset p-1"
+  <button
+    type="button"
+    role="switch"
+    aria-checked={theme === 'dark'}
+    aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+    onClick={() => onChange(theme === 'light' ? 'dark' : 'light')}
+    className="group relative inline-flex h-9 w-[72px] shrink-0 cursor-pointer items-center rounded-full border border-black/5 bg-white p-1 shadow-[inset_0_1px_3px_rgba(0,0,0,0.12)] transition-colors duration-200 dark:border-white/10 dark:bg-black dark:shadow-[inset_0_1px_3px_rgba(255,255,255,0.12)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--neu-accent)]"
   >
-    <label className="cursor-pointer">
-      <input
-        className="peer sr-only"
-        type="radio"
-        name="color-theme"
-        value="light"
-        checked={theme === 'light'}
-        onChange={() => onChange('light')}
-      />
-      <span className="flex h-8 w-9 items-center justify-center rounded-lg text-[var(--neu-text-muted)] transition-colors hover:text-[var(--neu-text-primary)] peer-checked:bg-[var(--neu-base)] peer-checked:text-amber-500 peer-checked:shadow-sm peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-[var(--neu-accent)]">
-        <Sun size={15} aria-hidden="true" />
-        <span className="sr-only">Light theme</span>
-      </span>
-    </label>
-    <label className="cursor-pointer">
-      <input
-        className="peer sr-only"
-        type="radio"
-        name="color-theme"
-        value="dark"
-        checked={theme === 'dark'}
-        onChange={() => onChange('dark')}
-      />
-      <span className="flex h-8 w-9 items-center justify-center rounded-lg text-[var(--neu-text-muted)] transition-colors hover:text-[var(--neu-text-primary)] peer-checked:bg-[var(--neu-base)] peer-checked:text-[var(--neu-accent)] peer-checked:shadow-sm peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-[var(--neu-accent)]">
-        <Moon size={15} aria-hidden="true" />
-        <span className="sr-only">Dark theme</span>
-      </span>
-    </label>
-  </div>
+    <Sun
+      size={16}
+      aria-hidden="true"
+      className="absolute left-[10px] text-[var(--neu-text-muted)]"
+    />
+    <Moon
+      size={16}
+      aria-hidden="true"
+      className="absolute right-[10px] text-[var(--neu-text-muted)]"
+    />
+    <span
+      className={`absolute left-1 top-1 flex h-7 w-7 items-center justify-center rounded-full border border-black/5 bg-[var(--neu-surface)] text-[var(--neu-accent)] shadow-[0_2px_5px_rgba(0,0,0,0.16)] transition-[transform,background-color,color,box-shadow] duration-200 ease-out group-hover:bg-[var(--neu-accent)] group-hover:text-white dark:border-white/10 dark:shadow-[0_2px_5px_rgba(0,0,0,0.4)] ${
+        theme === 'dark' ? 'translate-x-9' : ''
+      }`}
+    >
+      {theme === 'light' ? (
+        <Sun size={16} aria-hidden="true" />
+      ) : (
+        <Moon size={16} aria-hidden="true" />
+      )}
+    </span>
+  </button>
 );

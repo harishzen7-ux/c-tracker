@@ -27,7 +27,7 @@ export const NeuButton: React.FC<NeuButtonProps> = ({
 
   const variantClasses = {
     primary:
-      'neu-orange-gradient text-slate-950 font-semibold shadow-[4px_4px_12px_rgba(0,0,0,0.4),-3px_-3px_8px_rgba(255,255,255,0.06),0_0_14px_var(--neu-accent-glow)] hover:brightness-105 active:shadow-[inset_2px_2px_5px_rgba(0,0,0,0.5)] active:scale-[0.98]',
+      'neu-orange-gradient text-white dark:text-slate-950 font-semibold shadow-[4px_4px_12px_rgba(0,0,0,0.4),-3px_-3px_8px_rgba(255,255,255,0.06),0_0_14px_var(--neu-accent-glow)] hover:brightness-105 active:shadow-[inset_2px_2px_5px_rgba(0,0,0,0.5)] active:scale-[0.98]',
     secondary:
       'neu-raised text-[var(--neu-text-primary)] font-medium hover:text-[var(--neu-accent)] active:neu-inset active:scale-[0.98]',
     inset:

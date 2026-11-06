@@ -22,14 +22,18 @@ export const UserProfileCard: React.FC<UserProfileCardProps> = ({
     <NeuCard className="flex flex-col sm:flex-row items-center justify-between gap-6 p-6">
       <div className="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left">
         {/* Circular avatar with a ring */}
-        <div className="relative w-18 h-18 sm:w-20 sm:h-20 rounded-full neu-raised flex items-center justify-center p-1.5 shrink-0">
-          <div className="w-full h-full rounded-full neu-inset flex items-center justify-center border-2 border-[var(--neu-accent)]/50 shadow-[0_0_12px_var(--neu-accent-glow)]">
-            <span className="text-xl sm:text-2xl font-bold font-mono text-[var(--neu-accent)]">
+        <div
+          role="img"
+          aria-label={`${userName} profile`}
+          className="relative flex h-18 w-18 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[var(--neu-accent-light)] to-[var(--neu-accent)] p-[3px] shadow-[0_4px_16px_var(--neu-accent-glow)] sm:h-20 sm:w-20"
+        >
+          <div className="flex h-full w-full items-center justify-center rounded-full bg-[var(--neu-base)] shadow-[inset_2px_2px_5px_var(--neu-shadow-dark),inset_-2px_-2px_5px_var(--neu-shadow-light)]">
+            <span className="font-mono text-2xl font-black tracking-tight text-[var(--neu-accent)] sm:text-3xl">
               {userName.trim().charAt(0).toUpperCase()}
             </span>
           </div>
           <span
-            className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-emerald-500 border-2 border-[var(--neu-base)] shadow-[0_0_8px_rgba(34,197,94,0.8)]"
+            className="absolute bottom-0 right-0 h-4 w-4 rounded-full border-[3px] border-[var(--neu-surface)] bg-emerald-500 shadow-[0_0_8px_rgba(34,197,94,0.7)]"
             title="Online"
           />
         </div>

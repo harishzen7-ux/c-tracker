@@ -215,7 +215,10 @@ export const CodingArena: React.FC<CodingArenaProps> = ({
       try {
         const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         if (!reducedMotion) {
-          const colors = ['#FF7A1A', '#22c55e', '#38bdf8', '#fbbf24'];
+          const accent = getComputedStyle(document.documentElement)
+            .getPropertyValue('--neu-accent')
+            .trim();
+          const colors = [accent, '#22c55e', '#38bdf8', '#fbbf24'];
           confetti({
             particleCount: 90,
             spread: 78,
