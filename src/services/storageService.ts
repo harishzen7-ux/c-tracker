@@ -24,7 +24,7 @@ const defaultProgress: UserProgress = {
   },
   loginStreakVersion: LOGIN_STREAK_VERSION,
   themePreferenceVersion: THEME_PREFERENCE_VERSION,
-  theme: 'light',
+  theme: 'dark',
   timerEnabled: false,
   learningArena: {},
 };
@@ -70,7 +70,7 @@ function normalizeProgress(parsed: Partial<UserProgress>): UserProgress {
     solvedProblems: { ...parsed.solvedProblems },
     savedCode: { ...parsed.savedCode },
     learningArena: { ...parsed.learningArena },
-    theme: hasSavedThemePreference ? parsed.theme ?? defaultProgress.theme : 'light',
+    theme: hasSavedThemePreference ? parsed.theme ?? defaultProgress.theme : 'dark',
     streak: isLegacyStreak
       ? createDefaultProgress().streak
       : { ...defaultProgress.streak, ...parsed.streak },
