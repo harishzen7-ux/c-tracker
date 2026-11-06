@@ -1,5 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
   <title>C Tracker</title>
-  <rect width="64" height="64" rx="16" fill="#0057d9"/>
-  <path d="M43.5 18.5c-3-2.7-6.7-4-11-4-10.4 0-17.5 7.2-17.5 17.5S22.1 49.5 32.5 49.5c4.3 0 8-1.3 11-4l-5-6.1c-1.7 1.4-3.5 2.1-5.7 2.1-4.8 0-8-3.6-8-9.5s3.2-9.5 8-9.5c2.2 0 4 .7 5.7 2.1z" fill="#fff"/>
+  <defs>
+    <linearGradient id="c-gradient" x1="14" y1="14" x2="50" y2="50" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0057d9"/>
+      <stop offset="1" stop-color="#f97316"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="#fff"/>
+  <path d="M43.5 18.5c-3-2.7-6.7-4-11-4-10.4 0-17.5 7.2-17.5 17.5S22.1 49.5 32.5 49.5c4.3 0 8-1.3 11-4l-5-6.1c-1.7 1.4-3.5 2.1-5.7 2.1-4.8 0-8-3.6-8-9.5s3.2-9.5 8-9.5c2.2 0 4 .7 5.7 2.1z" fill="url(#c-gradient)"/>
 </svg>
