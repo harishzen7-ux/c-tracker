@@ -60,6 +60,22 @@ type ArenaCheckQuestion = KnowledgeCheckQuestion & {
   code?: string;
 };
 
+const answerPositions = [1, 3, 0, 2, 3, 0, 2, 1];
+
+const placeCorrectOption = <T,>(
+  options: [T, T, T, T],
+  correctIndex: number,
+  targetIndex: number,
+): { options: [T, T, T, T]; correctIndex: number } => {
+  const reordered = [...options];
+  const [correctOption] = reordered.splice(correctIndex, 1);
+  reordered.splice(targetIndex, 0, correctOption);
+  return {
+    options: reordered as [T, T, T, T],
+    correctIndex: targetIndex,
+  };
+};
+
 const conceptOutputPredictions: Record<string, OutputPredictionQuestion> = {
   'sec-escape-sequences': {
     code: '#include <stdio.h>\nint main(void) {\n    printf("A\\nB");\n    return 0;\n}',
@@ -230,6 +246,15 @@ export const LearningArena: React.FC<LearningArenaProps> = ({
       || lesson.quickCheck?.outputPrediction,
     [activeSectionIndex, currentSection, lesson.outputPredictions, lesson.quickCheck?.outputPrediction],
   );
+  const displayPrediction: OutputPredictionQuestion | undefined = useMemo(() => {
+    if (!prediction) return undefined;
+    const answer = placeCorrectOption(
+      prediction.options,
+      prediction.correctIndex,
+      answerPositions[activeSectionIndex % answerPositions.length],
+    );
+    return { ...prediction, ...answer };
+  }, [activeSectionIndex, prediction]);
   const exampleSet = useMemo(() => {
     const examples = lesson.examples ?? [];
     const selectedExamples = examples.length > 0
@@ -247,7 +272,7 @@ export const LearningArena: React.FC<LearningArenaProps> = ({
       ...selectedExamples,
     ].slice(0, 3);
   }, [activeSectionIndex, currentSection, lesson.examples]);
-  const exploreComplete = !prediction || exploreAnswer === prediction.correctIndex;
+  const exploreComplete = !displayPrediction || exploreAnswer === displayPrediction.correctIndex;
 
   const saveStage = (stage: LearningStage, nextStage: LearningStage = stage) => {
     if (!currentSection || !canOpenStage(stages.findIndex((item) => item.id === stage))) return;
@@ -371,58 +396,54 @@ export const LearningArena: React.FC<LearningArenaProps> = ({
   const checkQuestions = useMemo(() => {
     const syntaxQuestion: ArenaCheckQuestion = {
       question: 'Which example shows the correct syntax for this concept?',
-      options: [
+      ...placeCorrectOption([
         currentSection.syntax || 'The syntax is shown in the Learn step.',
         'repeat (condition) { work; }',
         'choose condition: work',
         'concept = [work]',
-      ] as [string, string, string, string],
-      correctIndex: 0,
+      ], 0, answerPositions[1]),
       explanation: 'The first example matches the C syntax shown in the Learn stage.',
     };
     const commonMistake = lesson.commonMistakes?.[activeSectionIndex % (lesson.commonMistakes.length || 1)];
     const mistakeQuestion: ArenaCheckQuestion = {
       question: 'Which statement describes a common mistake for this concept?',
-      options: [
+      ...placeCorrectOption([
         commonMistake?.mistake || 'Changing the code without checking the concept rule.',
         'Using the syntax shown in the lesson exactly as written.',
         'Reading the program from top to bottom before predicting its result.',
         'Checking that the output matches the values in the program.',
-      ] as [string, string, string, string],
-      correctIndex: 0,
+      ], 0, answerPositions[4]),
       explanation: commonMistake?.why || 'This is a common beginner mistake to watch for.',
     };
     const conceptQuestion: ArenaCheckQuestion = {
       question: 'In simple words, what does this concept help a C program do?',
-      options: [
+      ...placeCorrectOption([
         currentSection.concept,
         'It only adds comments and does not affect a program.',
         'It replaces every variable with a fixed value.',
         'It stops the program before main begins.',
-      ] as [string, string, string, string],
-      correctIndex: 0,
+      ], 0, answerPositions[0]),
       explanation: 'The first answer describes the purpose of the concept you just learned.',
     };
     const outputQuestion: ArenaCheckQuestion = {
       question: 'What will this short example print?',
-      options: (prediction?.options || ['The first value', 'The second value', 'Both values', 'Nothing']) as [string, string, string, string],
-      correctIndex: prediction?.correctIndex ?? 0,
-      explanation: prediction?.explanation || 'Trace the example from top to bottom to find its output.',
-      code: prediction?.code,
+      options: displayPrediction?.options || ['The first value', 'The second value', 'Both values', 'Nothing'] as [string, string, string, string],
+      correctIndex: displayPrediction?.correctIndex ?? answerPositions[2],
+      explanation: displayPrediction?.explanation || 'Trace the example from top to bottom to find its output.',
+      code: displayPrediction?.code,
     };
     const ruleQuestion: ArenaCheckQuestion = {
       question: 'Which rule should you remember when using this concept?',
-      options: [
+      ...placeCorrectOption([
         currentSection.keyPoint || 'Read each part carefully and follow the syntax.',
         'The concept can be written without any syntax.',
         'Every concept always produces the same output.',
         'The order of the statements never matters.',
-      ] as [string, string, string, string],
-      correctIndex: 0,
+      ], 0, answerPositions[3]),
       explanation: currentSection.keyPoint || 'This is the key rule from the Learn stage.',
     };
     return [conceptQuestion, syntaxQuestion, outputQuestion, ruleQuestion, mistakeQuestion];
-  }, [activeSectionIndex, currentSection, lesson.commonMistakes, prediction]);
+  }, [activeSectionIndex, currentSection, displayPrediction, lesson.commonMistakes]);
 
   const checkScore = checkQuestions.filter(
     (question, index) => checkAnswers[index] === question.correctIndex,
@@ -698,18 +719,18 @@ export const LearningArena: React.FC<LearningArenaProps> = ({
                 {prediction?.code
                   ? <CodeBlock code={prediction.code} />
                   : currentSection.codeSnippet && <CodeBlock code={currentSection.codeSnippet} />}
-                {prediction && (
+                {displayPrediction && (
                   <div className="rounded-2xl neu-inset p-4">
                     <p className="mb-3 text-sm font-semibold">What will this program print?</p>
                     <div className="grid gap-2 sm:grid-cols-2">
-                      {prediction.options.map((option, index) => (
-                        <AnswerButton key={option} label={`${String.fromCharCode(65 + index)}. ${option}`} selected={exploreAnswer === index} correct={index === prediction.correctIndex} onClick={() => setExploreAnswer(index)} />
+                      {displayPrediction.options.map((option, index) => (
+                        <AnswerButton key={option} label={`${String.fromCharCode(65 + index)}. ${option}`} selected={exploreAnswer === index} correct={index === displayPrediction.correctIndex} onClick={() => setExploreAnswer(index)} />
                       ))}
                     </div>
                     {exploreAnswer !== null && (
-                      <p className={`mt-3 text-sm ${exploreAnswer === prediction.correctIndex ? 'text-[var(--neu-green-tile-text)]' : 'text-[var(--callout-amber-text)]'}`}>
-                        <strong>{exploreAnswer === prediction.correctIndex ? 'Correct. ' : 'Not quite. '}</strong>
-                        {prediction.explanation}
+                      <p className={`mt-3 text-sm ${exploreAnswer === displayPrediction.correctIndex ? 'text-[var(--neu-green-tile-text)]' : 'text-[var(--callout-amber-text)]'}`}>
+                        <strong>{exploreAnswer === displayPrediction.correctIndex ? 'Correct. ' : 'Not quite. '}</strong>
+                        {displayPrediction.explanation}
                       </p>
                     )}
                   </div>
