@@ -556,7 +556,7 @@ int main() {
     number: 19,
     title: 'Fast Uppercase via Bitwise AND',
     difficulty: 'medium',
-    problemStatement: 'Read a lowercase letter C [a-z]. Clear its 5th bit using bitwise AND with ~32 (or \'_\') to convert it to uppercase and print "Uppercase = %c".',
+    problemStatement: 'Read a lowercase letter C [a-z]. Clear its 5th bit using bitwise AND with ~32 to convert it to uppercase and print "Uppercase = %c".',
     inputFormat: 'A single lowercase character C.',
     outputFormat: 'Print "Uppercase = %c" followed by a newline.',
     constraints: 'Input is a lowercase character [a-z].',
@@ -670,7 +670,7 @@ int main() {
 }`,
   },
 
-  // 23. Reverse Bits of 32-bit Integer
+  // 23. Reverse Bits of 8-bit Integer
   {
     id: 'op-code-23',
     topicId: 'operators-expressions',

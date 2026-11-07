@@ -302,6 +302,12 @@ export const codeRunnerService = {
         return assignments;
       });
 
+      // Preserve C integer semantics for digit-processing loops.
+      jsBody = jsBody.replace(
+        /\b([a-zA-Z_]\w*)\s*\/=\s*([^;]+);/g,
+        '$1 = Math.trunc($1 / ($2));',
+      );
+
       // Guard against infinite loops with execution iteration counter
       let iterCounter = 0;
       const MAX_ITERS = 200000;

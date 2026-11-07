@@ -506,7 +506,7 @@ int main() {
     problemStatement: 'Given Day D, Month M, and Year Y (1-9999), verify if it is a valid calendar date. Print "VALID DATE" or "INVALID DATE".',
     inputFormat: 'Three space-separated integers D M Y.',
     outputFormat: 'Print "VALID DATE" or "INVALID DATE" followed by a newline.',
-    constraints: '-100 <= D, M <= 100, 1 <= Y <= 9999',
+    constraints: '1 <= D <= 31, 1 <= M <= 12, 1 <= Y <= 9999',
     sampleCases: [
       { input: '29 2 2024\n', output: 'VALID DATE\n', explanation: '2024 is a leap year, so Feb 29 is valid.' },
       { input: '31 4 2023\n', output: 'INVALID DATE\n', explanation: 'April has only 30 days.' },

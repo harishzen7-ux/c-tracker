@@ -202,6 +202,7 @@ int main() {
       { input: '5\n', expectedOutput: 'Sum of digits = 5\n', isHidden: false },
       { input: '999\n', expectedOutput: 'Sum of digits = 27\n', isHidden: true },
       { input: '0\n', expectedOutput: 'Sum of digits = 0\n', isHidden: true },
+      { input: '1000000000\n', expectedOutput: 'Sum of digits = 1\n', isHidden: true },
     ],
     starterCode: `#include <stdio.h>
 
@@ -293,6 +294,8 @@ int main() {
       { input: '123\n', expectedOutput: 'NOT PALINDROME\n', isHidden: false },
       { input: '7\n', expectedOutput: 'PALINDROME\n', isHidden: true },
       { input: '1001\n', expectedOutput: 'PALINDROME\n', isHidden: true },
+      { input: '0\n', expectedOutput: 'PALINDROME\n', isHidden: true },
+      { input: '10\n', expectedOutput: 'NOT PALINDROME\n', isHidden: true },
     ],
     starterCode: `#include <stdio.h>
 

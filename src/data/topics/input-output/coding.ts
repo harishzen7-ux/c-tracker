@@ -17,7 +17,6 @@ export const inputOutputCodingQuestions: CodingQuestion[] = [
     ],
     testCases: [
       { input: '', expectedOutput: 'Hello, World!\n', isHidden: false },
-      { input: '', expectedOutput: 'Hello, World!\n', isHidden: false },
       { input: 'extra_input\n', expectedOutput: 'Hello, World!\n', isHidden: true },
       { input: '\n', expectedOutput: 'Hello, World!\n', isHidden: true },
     ],
