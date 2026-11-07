@@ -648,14 +648,14 @@ export const MCQCheck: React.FC<MCQCheckProps> = ({ mcqs, topicId, onScoreSaved 
             if (isSubmitted) {
               const isCorrect = selectedAnswers[idx] === q.correctIndex;
               paletteStyle = isCorrect
-                ? 'bg-[#0BDA51]/25 text-[var(--neu-green-tile-text)] font-bold border border-[#0BDA51]/60 shadow-[inset_2px_2px_5px_rgba(0,0,0,0.2),inset_-2px_-2px_5px_rgba(255,255,255,0.12),0_0_4px_rgba(11,218,81,0.2)]'
-                : 'bg-red-500/25 text-rose-800 dark:text-rose-300 font-bold border border-red-500/60 shadow-[inset_2px_2px_5px_rgba(0,0,0,0.2),inset_-2px_-2px_5px_rgba(255,255,255,0.1),0_0_4px_rgba(239,68,68,0.18)]';
+                ? 'neu-raised !bg-[#0BDA51]/20 text-[var(--neu-green-tile-text)] font-bold'
+                : 'neu-raised bg-red-500/10 text-rose-800 dark:text-rose-300 font-bold';
             } else if (isCur) {
-              paletteStyle = 'neu-inset text-[var(--neu-accent)] border border-[var(--neu-accent)]/80 shadow-[0_0_10px_var(--neu-accent-glow)] font-bold';
+              paletteStyle = 'neu-raised bg-[var(--neu-accent)]/10 text-[var(--neu-accent)] font-bold';
             } else if (isRev) {
-              paletteStyle = 'neu-inset text-amber-400 border border-amber-400/60 shadow-[0_0_7px_rgba(251,191,36,0.2)]';
+              paletteStyle = 'neu-raised bg-amber-400/10 text-amber-500';
             } else if (isAnswered) {
-              paletteStyle = 'bg-[var(--neu-accent)] text-white border border-[var(--neu-accent-light)]/60 shadow-[3px_3px_8px_var(--neu-shadow-dark),-3px_-3px_7px_var(--neu-shadow-light),0_0_8px_var(--neu-accent-glow)] font-semibold';
+              paletteStyle = 'neu-raised bg-[var(--neu-accent)]/10 text-[var(--neu-accent)] font-semibold';
             }
 
             return (
