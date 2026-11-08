@@ -96,6 +96,7 @@ export interface MCQ {
   question: string;
   codeSnippet?: string;
   options: [string, string, string, string];
+  optionExplanations: [string, string, string, string];
   correctIndex: number; // 0, 1, 2, 3
   explanation: string;
   subtopic: string;

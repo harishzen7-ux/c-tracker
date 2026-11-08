@@ -6,6 +6,7 @@ export type MCQRow = {
   options: [string, string, string, string];
   correctIndex: number;
   explanation: string;
+  optionExplanations?: [string, string, string, string];
   subtopic: string;
   codeSnippet?: string;
 };
@@ -95,12 +96,33 @@ function formatCodeSnippet(code: string): string {
 
 export function buildMCQBank(topicId: TopicId, prefix: string, rows: MCQRow[]): MCQ[] {
   const answerPositions = [1, 3, 0, 2, 3, 0, 2, 1, 0, 2, 1, 3, 2, 1, 3, 0];
+  const targetCounts: Record<Difficulty, number> = {
+    easy: 15,
+    medium: 20,
+    hard: 15,
+  };
+  const prioritizedRows = rows.filter((row) => row.subtopic.toLowerCase().includes('theory'));
+  const remainingRows = rows.filter((row) => !row.subtopic.toLowerCase().includes('theory'));
+  const selectedRows: MCQRow[] = [];
 
-  return rows.map((row, index) => {
+  (Object.keys(targetCounts) as Difficulty[]).forEach((difficulty) => {
+    const theoryRows = prioritizedRows.filter((row) => row.difficulty === difficulty);
+    const otherRows = remainingRows.filter((row) => row.difficulty === difficulty);
+    selectedRows.push(...theoryRows, ...otherRows.slice(0, targetCounts[difficulty] - theoryRows.length));
+  });
+
+  return selectedRows.map((row, index) => {
     const targetIndex = answerPositions[index % answerPositions.length];
     const options = [...row.options];
+    const optionExplanations = row.optionExplanations
+      ? [...row.optionExplanations]
+      : row.options.map((option, optionIndex) => optionIndex === row.correctIndex
+        ? `Correct. ${row.explanation}`
+        : `This option means "${option}", but it does not satisfy the question. The correct concept is explained above.`) as [string, string, string, string];
     const [correctOption] = options.splice(row.correctIndex, 1);
+    const [correctExplanation] = optionExplanations.splice(row.correctIndex, 1);
     options.splice(targetIndex, 0, correctOption);
+    optionExplanations.splice(targetIndex, 0, correctExplanation);
     const prompt = row.question === 'What is printed?'
       ? `What is printed by this ${row.subtopic.toLowerCase()} example?`
       : row.question === 'How many iterations occur?'
@@ -114,6 +136,7 @@ export function buildMCQBank(topicId: TopicId, prefix: string, rows: MCQRow[]): 
       question: prompt,
       codeSnippet: row.codeSnippet ? formatCodeSnippet(row.codeSnippet) : undefined,
       options: options as [string, string, string, string],
+      optionExplanations: optionExplanations as [string, string, string, string],
       correctIndex: targetIndex,
     };
   });

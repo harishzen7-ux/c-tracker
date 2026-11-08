@@ -385,7 +385,7 @@ export const MCQCheck: React.FC<MCQCheckProps> = ({ mcqs, topicId, onScoreSaved 
             </div>
           </div>
 
-          <div className="flex items-center justify-between pt-4 border-t border-[var(--neu-border)]">
+          <div className="sticky bottom-4 z-20 flex items-center justify-between gap-3 rounded-2xl border border-[var(--neu-border)] bg-[var(--neu-surface)]/95 px-3 py-3 pt-4 shadow-[0_8px_24px_var(--neu-shadow-dark)] backdrop-blur-md sm:px-4">
             <span className="text-xs text-[var(--neu-text-muted)]">
               Use the question navigator below to inspect verified answers and explanations.
             </span>
@@ -397,7 +397,7 @@ export const MCQCheck: React.FC<MCQCheckProps> = ({ mcqs, topicId, onScoreSaved 
       )}
 
         {/* Main Question Card */}
-        <NeuCard className="p-6 sm:p-8 flex flex-col gap-6 border border-[var(--neu-border)]">
+        <NeuCard className="flex min-h-[720px] flex-col gap-6 border border-[var(--neu-border)] p-6 sm:p-8">
           {/* Question Header & Review Bookmark */}
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-3">
@@ -543,22 +543,89 @@ export const MCQCheck: React.FC<MCQCheckProps> = ({ mcqs, topicId, onScoreSaved 
 
         {/* Review Mode: Detailed Explanation Callout */}
         {isSubmitted && (
-          <div className="p-5 rounded-2xl bg-[var(--neu-surface)] border border-[var(--neu-accent)]/30 neu-raised flex flex-col gap-3">
-            <div className="flex items-center gap-2 text-xs font-bold font-mono uppercase tracking-wider text-[var(--neu-accent)]">
-              <Lightbulb size={16} />
-              <span>Answer explanation</span>
+          <div className="overflow-hidden rounded-2xl border border-[var(--neu-accent)]/25 bg-[var(--neu-base)] shadow-[inset_0_1px_0_var(--neu-shadow-light)]">
+            <div className="flex flex-col gap-4 border-b border-[var(--neu-border)] bg-[var(--neu-surface)]/70 p-5 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-start gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--neu-accent)]/12 text-[var(--neu-accent)]">
+                  <Lightbulb size={19} />
+                </div>
+                <div>
+                  <div className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-[var(--neu-accent)]">
+                    Review explanation
+                  </div>
+                  <h3 className="mt-1 text-base font-bold text-[var(--neu-text-primary)]">
+                    Understand the answer
+                  </h3>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 self-start rounded-full bg-[#0BDA51]/12 px-3 py-1.5 text-xs font-semibold text-[var(--neu-green-tile-text)] sm:self-auto">
+                <CheckCircle2 size={15} />
+                Correct option: {String.fromCharCode(65 + currentQ.correctIndex)}
+              </div>
             </div>
-            <div className="rounded-xl px-3 py-2 neu-inset text-xs font-mono text-[var(--neu-text-secondary)]">
-              Correct option: <strong className="text-[var(--neu-text-primary)]">{String.fromCharCode(65 + currentQ.correctIndex)}</strong>
+
+            <div className="p-5">
+              <div className="mb-3 mt-5 flex items-center justify-between">
+                <div className="text-[10px] font-mono font-bold uppercase tracking-[0.18em] text-[var(--neu-text-muted)]">
+                  Option-by-option review
+                </div>
+                <div className="text-[10px] text-[var(--neu-text-muted)]">
+                  {currentSelected !== undefined ? 'Your selection is highlighted' : 'Compare all choices'}
+                </div>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+              {currentQ.options.map((option, optionIndex) => (
+                <div
+                  key={optionIndex}
+                  className={`rounded-xl border p-3 ${
+                    optionIndex === currentQ.correctIndex
+                      ? 'border-[#0BDA51]/30 bg-[#0BDA51]/8'
+                      : 'border-[var(--neu-border)] bg-[var(--neu-surface)]/55'
+                  }`}
+                >
+                  <div className="flex items-start gap-2.5">
+                    <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-[11px] font-bold ${
+                      optionIndex === currentQ.correctIndex
+                        ? 'bg-[#0BDA51]/20 text-[var(--neu-green-tile-text)]'
+                        : 'neu-inset text-[var(--neu-text-muted)]'
+                    }`}>
+                      {String.fromCharCode(65 + optionIndex)}
+                    </span>
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <strong className="text-xs font-semibold text-[var(--neu-text-primary)]">
+                          {option.replace(/\.\s*$/, '')}
+                        </strong>
+                        {optionIndex === currentQ.correctIndex && (
+                          <span className="rounded-full bg-[#0BDA51]/15 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[var(--neu-green-tile-text)]">
+                            Correct
+                          </span>
+                        )}
+                        {optionIndex === currentSelected && optionIndex !== currentQ.correctIndex && (
+                          <span className="rounded-full bg-rose-500/12 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-rose-600 dark:text-rose-300">
+                            Your answer
+                          </span>
+                        )}
+                      </div>
+                      <p className={`mt-1.5 text-xs leading-relaxed ${
+                        optionIndex === currentQ.correctIndex
+                          ? 'text-[var(--neu-green-tile-text)]'
+                          : 'text-[var(--neu-text-secondary)]'
+                      }`}>
+                        {currentQ.optionExplanations[optionIndex]}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              </div>
             </div>
-            <p className="text-xs sm:text-sm text-[var(--neu-text-primary)] leading-relaxed">
-              {currentQ.explanation}
-            </p>
           </div>
         )}
 
         {/* Navigation & Submit Buttons */}
-        <div className="flex items-center justify-between pt-4 border-t border-[var(--neu-border)]">
+        <div className="mt-auto flex items-center justify-between gap-3 border-t border-[var(--neu-border)] pt-4">
           <NeuButton
             variant="secondary"
             size="sm"
